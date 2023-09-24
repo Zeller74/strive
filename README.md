@@ -1,0 +1,2 @@
+# strive
+Study group platform
