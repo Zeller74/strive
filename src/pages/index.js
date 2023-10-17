@@ -18,7 +18,7 @@ export default function Home() {
               </>
             ) : (
               <div className={styles.label}>
-                Sign in to create your todo list!
+                strive
               </div>
             )}
           </div>
@@ -33,7 +33,7 @@ const Header = () => {
 
   return (
     <header className={styles.header}>
-      <div>My Todo App</div>
+      <div>Strive</div>
       {isSignedIn ? (
         <UserButton />
       ) : (
