@@ -37,7 +37,7 @@ const ChatMessages = ({ messages, setMessages }) => {
   );
 };
 
-function SendMessageForm({ messages, setMessages }) {
+function SendMessageForm({ messages, setMessages, refreshMessages }) {
   const { getToken, userId } = useAuth();
   const [newMessage, setNewMessage] = useState("");
   const { session } = useSession();
@@ -78,6 +78,8 @@ function SendMessageForm({ messages, setMessages }) {
 
     setMessages([...messages, data]);
     setNewMessage("");
+
+    refreshMessages();
   };
 
   return (
@@ -96,6 +98,46 @@ export default function Home() {
   const [messages, setMessages] = useState([]);
   const { getToken, userId } = useAuth();
   const [selectedStudyGroup, setSelectedStudyGroup] = useState(0); // State for the selected group
+
+  async function fetchMessagesForGroup() {
+    const supabaseAccessToken = await getToken({ template: "supabase" });
+    const supabase = await supabaseClient(supabaseAccessToken);
+
+    // Fetch messages for the group
+    const { data: groupMessages, error: error1 } = await supabase
+      .from("message")
+      .select("*")
+      .match({ study_group: selectedStudyGroup })
+      .order("id", { ascending: false });
+
+    if (error1) {
+      console.error("Error fetching group messages:", error1);
+      return;
+    }
+
+    // Fetch all users
+    const { data: users, error: error2 } = await supabase
+      .from("user")
+      .select("*");
+
+    if (error2) {
+      console.error("Error fetching users:", error2);
+      return;
+    }
+
+    // Manually join the messages with users
+    const joinedMessages = groupMessages.map((message) => {
+      const userForMessage = users.find(
+        (user) => user.user_id === message.user_id
+      );
+      return {
+        ...message,
+        user: userForMessage,
+      };
+    });
+
+    setMessages(joinedMessages);
+  }
 
   useEffect(() => {
     // Function to ensure user exists in Supabase
@@ -127,71 +169,13 @@ export default function Home() {
   }, [isLoading, isSignedIn, user, getToken]); // Added dependencies here
 
   useEffect(() => {
-    async function fetchMessagesForGroup() {
-      const supabaseAccessToken = await getToken({ template: "supabase" });
-      const supabase = await supabaseClient(supabaseAccessToken);
-
-      // Fetch messages for the group
-      const { data: groupMessages, error: error1 } = await supabase
-        .from("message")
-        .select("*")
-        .match({ study_group: selectedStudyGroup })
-        .order("id", { ascending: false });
-
-      if (error1) {
-        console.error("Error fetching group messages:", error1);
-        return;
-      }
-
-      // Fetch all users
-      const { data: users, error: error2 } = await supabase
-        .from("user")
-        .select("*");
-
-      if (error2) {
-        console.error("Error fetching users:", error2);
-        return;
-      }
-
-      // Manually join the messages with users
-      const joinedMessages = groupMessages.map((message) => {
-        const userForMessage = users.find(
-          (user) => user.user_id === message.user_id
-        );
-        return {
-          ...message,
-          user: userForMessage,
-        };
-      });
-
-      setMessages(joinedMessages);
-    }
 
     fetchMessagesForGroup();
-  }, [selectedStudyGroup]);
+    // Set up an interval to call it every 5 seconds
+    const interval = setInterval(fetchMessagesForGroup, 5000);
 
-  useEffect(() => {
-    async function updateRealTime() {
-      const handleInserts = (payload) => {
-        console.log("Received payload:", payload); // Add this line
-        if (payload.event === "INSERT") {
-          setMessages((prevMessages) => [...prevMessages, payload.new]);
-        }
-      };
-
-      const supabaseAccessToken = await getToken({ template: "supabase" });
-      const supabase = await supabaseClient(supabaseAccessToken);
-      const subscription = supabase
-        .channel(`message:study_group=eq.${selectedStudyGroup}`)
-        .on("INSERT", handleInserts)
-        .subscribe();
-
-      return () => {
-        // Clean up the subscription when the component unmounts
-        supabase.removeSubscription(subscription);
-      };
-    }
-    updateRealTime();
+    // Clear the interval when the component is unmounted
+    return () => clearInterval(interval);
   }, [selectedStudyGroup]);
 
   return (
@@ -208,6 +192,7 @@ export default function Home() {
                 <SendMessageForm
                   messages={messages}
                   setMessages={setMessages}
+                  refreshMessages={fetchMessagesForGroup}
                 />
                 <ChatMessages messages={messages} setMessages={setMessages} />
               </>
