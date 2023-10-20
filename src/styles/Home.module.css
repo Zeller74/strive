@@ -25,11 +25,46 @@
     display: flex;
     flex-direction: column-reverse; /* This reverses the display order */
     overflow-y: auto; /* Make it scrollable */
-    height: 400px; /* Adjust as per your needs */
-    width: 400px;
-    margin-left: 30%;
+    height: 600px; /* Adjust as per your needs */
+    width: 60%;
+    margin-left: 10%;
+    margin-top: 2%;
+    background-color: rgb(224, 224, 224);
   }
   
+  .chatInput {
+    width: 85%;  /* Adjust this percentage based on your preference */
+    display: block;  /* This ensures it takes the full width you set */
+    margin: 0 auto;  /* Centers the input if its width is less than its container's width */
+    padding: 10px; /* Optional: add some padding for better appearance */
+    border-radius: 4px; /* Optional: to give rounded corners */
+    margin-bottom: 0px;
+}
+  
+.chatInput:focus {
+  border-color: #0077b6; /* Change the border color when input is focused */
+}
+
+.sendMessageForm {
+  display: flex;  /* This makes the form a flex container */
+  justify-content: space-between;  /* This spreads the child elements horizontally */
+  align-items: center;  /* This centers the child elements vertically */
+  padding: 15px;
+}
+
+.sendButton {
+  padding: 10px 20px;
+  background-color: #0077b6; /* Adjust color as needed */
+  color: #ffffff;
+  border: none;
+  border-radius: 4px; /* rounded on the right side */
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.sendButton:hover {
+  background-color: #005486; /* Slightly darker color on hover */
+}
   
   .studyGroupSidebar {
     flex: 0 0 200px; /* flex-grow | flex-shrink | flex-basis */
@@ -80,4 +115,5 @@
     background-color: #d1d1d1; /* Customize this as needed */
     /* Other styling properties if you need, like change in font color, border, etc. */
   }
+  
   

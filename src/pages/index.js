@@ -229,15 +229,17 @@ function SendMessageForm({
     refreshMessages();
   };
 
-  return (
-    <form onSubmit={handleSubmit}>
-      <input
-        onChange={(e) => setNewMessage(e.target.value)}
-        value={newMessage}
-      />
-      <button>Send</button>
-    </form>
-  );
+return (
+  <form className={styles.sendMessageForm} onSubmit={handleSubmit}>
+    <input
+      className={styles.chatInput}
+      onChange={(e) => setNewMessage(e.target.value)}
+      value={newMessage}
+    />
+    <button className={styles.sendButton}>Send</button>
+  </form>
+);
+
 }
 
 export default function Home() {
