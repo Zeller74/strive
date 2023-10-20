@@ -76,4 +76,8 @@
     border-color: red; /* Or any other desired color for leave button */
   }
   
+  .selectedStudyGroup {
+    background-color: #d1d1d1; /* Customize this as needed */
+    /* Other styling properties if you need, like change in font color, border, etc. */
+  }
   

@@ -46,8 +46,6 @@ const ChatMessages = ({ messages, setMessages }) => {
   );
 };
 
-
-
 function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
   const { getToken, userId } = useAuth();
   const [groups, setGroups] = useState([]);
@@ -71,41 +69,44 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
 
       setGroups(allGroupsData); // This will set the list of ALL study groups
       setUserGroups(userEnrollments.map((e) => e.study_group)); // This will set only the ones user is part of
+
+      if (userEnrollments.length > 0) {
+        setSelectedStudyGroup(userEnrollments[0].study_group);
+      }
     };
 
     fetchGroups();
-  }, [userId]);
+  }, [userId, setSelectedStudyGroup]);
 
   const joinGroup = async (groupId) => {
     const supabaseAccessToken = await getToken({ template: "supabase" });
     const supabase = await supabaseClient(supabaseAccessToken);
-    
+
     // Check if the user is already enrolled in the study group
     const { data, error } = await supabase
-        .from("enrollment")
-        .select("*")
-        .eq("user_id", userId)
-        .eq("study_group", groupId);
+      .from("enrollment")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("study_group", groupId);
 
     if (error) {
-        console.error("Error fetching enrollment:", error);
-        return;
+      console.error("Error fetching enrollment:", error);
+      return;
     }
 
     // If the user is already enrolled, notify and exit
     if (data && data.length > 0) {
-        console.warn("User is already a member of this study group.");
-        return;
+      console.warn("User is already a member of this study group.");
+      return;
     }
 
     // If the user is not already enrolled, add them to the study group
     await supabase
-        .from("enrollment")
-        .insert({ user_id: userId, study_group: groupId });
-    
-    setUserGroups([...userGroups, groupId]);
-};
+      .from("enrollment")
+      .insert({ user_id: userId, study_group: groupId });
 
+    setUserGroups([...userGroups, groupId]);
+  };
 
   const leaveGroup = async (groupId) => {
     console.log("Attempting to leave group with ID:", groupId);
@@ -138,7 +139,11 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
           return (
             <div key={group.id} className="studyGroupItem">
               <button
-                className={styles.studyGroupButton}
+                className={`${styles.studyGroupButton} ${
+                  selectedStudyGroup === group.id
+                    ? styles.selectedStudyGroup
+                    : ""
+                }`}
                 onClick={() => handleClick(group.id)}
               >
                 {group.name}
@@ -154,9 +159,19 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
           <li key={group.id}>
             {group.name}
             {userGroups.includes(group.id) ? (
-              <button className={styles.leaveButton} onClick={() => leaveGroup(group.id)}>Leave</button>
+              <button
+                className={styles.leaveButton}
+                onClick={() => leaveGroup(group.id)}
+              >
+                Leave
+              </button>
             ) : (
-              <button className={styles.joinButton} onClick={() => joinGroup(group.id)}>Join</button>
+              <button
+                className={styles.joinButton}
+                onClick={() => joinGroup(group.id)}
+              >
+                Join
+              </button>
             )}
           </li>
         ))}
@@ -329,7 +344,7 @@ export default function Home() {
 
                   {/* Chat and message form on the right */}
                   <div className={styles.chatContainer}>
-                  <SendMessageForm
+                    <SendMessageForm
                       messages={messages}
                       setMessages={setMessages}
                       refreshMessages={fetchMessagesForGroup}
@@ -339,7 +354,6 @@ export default function Home() {
                       messages={messages}
                       setMessages={setMessages}
                     />
-                    
                   </div>
                 </div>
               </>
