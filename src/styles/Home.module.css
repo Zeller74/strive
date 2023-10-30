@@ -1,83 +1,120 @@
 .header {
-    padding: 1rem 2rem;
-    height: 4rem;
-    background-color: lightgray;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .container {
-    padding: 1rem 2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-  }
+  padding: 1rem 2rem;
+  height: 4rem;
+  background-color: lightgray;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: auto;
+  transition: background-color 0.5s ease;
+}
+.header:hover{
+  background-color: rgb(0, 31, 41);
+  color: white;
+}
 
-  .studyGroupContainer {
-    display: flex; 
-    width: 100%; /* Ensure it spans the entire width of its parent */
-  }
+.accountIn{
+display: grid;
+place-content: center;
+border-radius: 9px;
+border-color: white;
+background: rgb(0, 31, 41);
+color: white;
+width: 160%;
+height: 40px;
+transition: background-color 0.5s ease;
+}
+.accountIn:hover{
+background: white;
+color: rgb(0, 31, 41);
+border-color: rgb(0, 31, 41);;
+}
 
-  .chatContainer {
-    display: flex;
-    flex-direction: column-reverse; /* This reverses the display order */
-    overflow-y: auto; /* Make it scrollable */
-    height: 400px; /* Adjust as per your needs */
-    width: 400px;
-    margin-left: 30%;
-  }
-  
-  
-  .studyGroupSidebar {
-    flex: 0 0 200px; /* flex-grow | flex-shrink | flex-basis */
-    margin-right: 00px;
-    width: 200px;
-  }
-  
-  .studyGroupButton {
-    display: block; /* Make the entire box clickable */
-    padding: 10px; /* Add padding for comfort */
-    cursor: pointer; /* Indicate that it's clickable */
-    border: 2px solid #000; /* Add an outline */
-    margin-bottom: 5px; /* Space between each group button */
-    transition: background-color 0.3s; /* Smooth transition for hover effect */
-    text-align: left; /* Align text to the left */
-    width: 100%; /* Take full width */
-    box-sizing: border-box; /* Include padding and border in the width */
-    background-color: #fff; /* White background */
-    color: #000; /* Black text */
-  }
-  
-  .studyGroupButton:hover {
-    background-color: #b5b5b5; /* Add a hover effect */
-  }
-  
-  .leaveButton, .joinButton {
-    border: 2px solid #333; /* Change #333 to your desired color */
-    padding: 5px 10px;
-    margin-left: 10px;
-    cursor: pointer;
-    background-color: white;
-    transition: background-color 0.2s ease;
-  }
-  
-  .leaveButton:hover, .joinButton:hover {
-    background-color: #f5f5f5; /* Change this color for hover effect */
-  }
-  
-  .joinButton {
-    border-color: green; /* Or any other desired color for join button */
-  }
-  
-  .leaveButton {
-    border-color: red; /* Or any other desired color for leave button */
-  }
-  
-  .selectedStudyGroup {
-    background-color: #d1d1d1; /* Customize this as needed */
-    /* Other styling properties if you need, like change in font color, border, etc. */
-  }
-  
+.accountUp{
+display: grid;
+place-content: center;
+border-radius: 9px;
+border-color: white;
+background: rgb(0, 31, 41);
+color: white;
+width: 160%;
+height: 40px;
+transition: background-color 0.5s ease;
+}
+.accountUp:hover{
+background: white;
+color: rgb(0, 31, 41);
+border-color: rgb(0, 31, 41);;
+}
+.welcome{
+text-align: center;
+height: 250px;
+display: grid;
+grid-template-columns: auto;
+color: white;
+background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 1), rgba(0, 0, 0, 1), rgba(255, 255, 255, 0));
+}
+
+.welcome p{
+font-size: 35px;
+}
+.welcomeSignUp{
+height: 80px;
+width: 30%;
+display: grid;
+background: rgb(0, 31, 41);
+color: white;
+border-radius: 9px;
+border-color: white;
+margin: auto;
+font-size: 35px;
+transition: background-color 0.5s ease;
+}
+.welcomeSignUp:hover{
+background: white;
+color: rgb(0, 31, 41);
+border-color: rgb(0, 31, 41);
+}
+.descriptions p{
+float: left;
+margin-right: 80px;
+margin-left: 80px;
+margin-top: 5px;
+text-align: center;
+font-size: 20px;
+transition: background-color 0.5s ease;
+border-radius: 9px;
+}
+.descriptions p:hover{
+color: white;
+background-color: rgb(0, 31, 41);
+}
+
+.descriptions{
+margin: auto;
+height: 400px;
+display: flex;
+justify-content: center;
+align-items: center;
+}
+.main {
+  margin: auto;
+  max-width: 400px;
+}
+
+.label {
+  padding: 1rem 2rem;
+  color:black;
+}
+
+.container {
+  padding: 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.todoList {
+  padding-left: 1rem;
+  align-self: baseline;
+}

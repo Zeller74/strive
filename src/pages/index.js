@@ -1,5 +1,5 @@
 import styles from "../styles/Home.module.css";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 
 import {
   useAuth,
@@ -25,24 +25,15 @@ const supabaseClient = async (supabaseAccessToken) => {
 };
 
 const ChatMessages = ({ messages, setMessages }) => {
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (container) {
-      container.scrollTop = container.scrollHeight;
-    }
-  }, [messages]);
-
   return (
-    <div className="chatContainer" ref={containerRef}>
+    <>
       {messages?.filter(Boolean).map((message) => (
         <div key={message.id}>
           <strong>{message.user?.name ?? "Unknown User"}</strong>:{" "}
           {message?.text ?? "Message not available"}
         </div>
       ))}
-    </div>
+    </>
   );
 };
 
@@ -55,62 +46,37 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
     const fetchGroups = async () => {
       const supabaseAccessToken = await getToken({ template: "supabase" });
       const supabase = await supabaseClient(supabaseAccessToken);
-
+  
       // Fetch all study groups
       const { data: allGroupsData } = await supabase
         .from("study_group")
         .select("*");
-
+  
       // Fetch only the study groups where the user is enrolled
       const { data: userEnrollments } = await supabase
         .from("enrollment")
         .select("study_group")
         .eq("user_id", userId);
-
-      setGroups(allGroupsData); // This will set the list of ALL study groups
-      setUserGroups(userEnrollments.map((e) => e.study_group)); // This will set only the ones user is part of
-
-      if (userEnrollments.length > 0) {
-        setSelectedStudyGroup(userEnrollments[0].study_group);
-      }
+  
+      setGroups(allGroupsData);  // This will set the list of ALL study groups
+      setUserGroups(userEnrollments.map(e => e.study_group));  // This will set only the ones user is part of
     };
-
+    
     fetchGroups();
-  }, [userId, setSelectedStudyGroup]);
+  }, [userId]);
+  
+
 
   const joinGroup = async (groupId) => {
     const supabaseAccessToken = await getToken({ template: "supabase" });
     const supabase = await supabaseClient(supabaseAccessToken);
-
-    // Check if the user is already enrolled in the study group
-    const { data, error } = await supabase
-      .from("enrollment")
-      .select("*")
-      .eq("user_id", userId)
-      .eq("study_group", groupId);
-
-    if (error) {
-      console.error("Error fetching enrollment:", error);
-      return;
-    }
-
-    // If the user is already enrolled, notify and exit
-    if (data && data.length > 0) {
-      console.warn("User is already a member of this study group.");
-      return;
-    }
-
-    // If the user is not already enrolled, add them to the study group
     await supabase
       .from("enrollment")
       .insert({ user_id: userId, study_group: groupId });
-
     setUserGroups([...userGroups, groupId]);
   };
 
   const leaveGroup = async (groupId) => {
-    console.log("Attempting to leave group with ID:", groupId);
-
     const supabaseAccessToken = await getToken({ template: "supabase" });
     const supabase = await supabaseClient(supabaseAccessToken);
     await supabase
@@ -120,58 +86,33 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
       .eq("study_group", groupId);
     setUserGroups(userGroups.filter((g) => g !== groupId));
   };
-  const handleClick = (groupId) => {
-    setSelectedStudyGroup(groupId);
-  };
 
   return (
     <div>
-      <h3>
-        Currently Viewing:{" "}
-        {groups.find((g) => g.id === selectedStudyGroup)?.name ||
-          "Select a Study Group"}
-      </h3>
-
-      <div className={styles.studyGroupSidebar}>
+      <h3>Study Groups</h3>
+      <select
+        value={selectedStudyGroup}
+        onChange={(e) => setSelectedStudyGroup(Number(e.target.value))}
+      >
         {userGroups.map((groupId) => {
-          const group = groups.find((g) => g.id === groupId);
-          if (!group) return null;
-          return (
-            <div key={group.id} className="studyGroupItem">
-              <button
-                className={`${styles.studyGroupButton} ${
-                  selectedStudyGroup === group.id
-                    ? styles.selectedStudyGroup
-                    : ""
-                }`}
-                onClick={() => handleClick(group.id)}
-              >
-                {group.name}
-              </button>
-            </div>
-          );
-        })}
-      </div>
+  const group = groups.find((g) => g.id === groupId);
+  if (!group) return null;
+  return (
+    <option key={group.id} value={group.id}>
+      {group.name}
+    </option>
+  );
+})}
 
-      <h3>All Study Groups:</h3>
+      </select>
       <ul>
         {groups.map((group) => (
           <li key={group.id}>
             {group.name}
             {userGroups.includes(group.id) ? (
-              <button
-                className={styles.leaveButton}
-                onClick={() => leaveGroup(group.id)}
-              >
-                Leave
-              </button>
+              <button onClick={() => leaveGroup(group.id)}>Leave</button>
             ) : (
-              <button
-                className={styles.joinButton}
-                onClick={() => joinGroup(group.id)}
-              >
-                Join
-              </button>
+              <button onClick={() => joinGroup(group.id)}>Join</button>
             )}
           </li>
         ))}
@@ -180,12 +121,7 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
   );
 }
 
-function SendMessageForm({
-  messages,
-  setMessages,
-  refreshMessages,
-  selectedStudyGroup,
-}) {
+function SendMessageForm({ messages, setMessages, refreshMessages, selectedStudyGroup }) {
   const { getToken, userId } = useAuth();
   const [newMessage, setNewMessage] = useState("");
   const { session } = useSession();
@@ -255,7 +191,7 @@ export default function Home() {
       .from("message")
       .select("*")
       .match({ study_group: selectedStudyGroup })
-      .order("id", { ascending: true });
+      .order("id", { ascending: false });
 
     if (error1) {
       console.error("Error fetching group messages:", error1);
@@ -330,35 +266,46 @@ export default function Home() {
       {isLoading ? (
         <></>
       ) : (
-        <main className={styles.main}>
+        <main  >
           <div className={styles.container}>
             {isSignedIn ? (
               <>
                 <div className={styles.label}>Welcome {user.firstName}!</div>
-                <div className={styles.studyGroupContainer}>
-                  {/* Sidebar with study groups on the left */}
-                  <StudyGroups
-                    selectedStudyGroup={selectedStudyGroup}
-                    setSelectedStudyGroup={setSelectedStudyGroup}
-                  />
-
-                  {/* Chat and message form on the right */}
-                  <div className={styles.chatContainer}>
-                    <SendMessageForm
-                      messages={messages}
-                      setMessages={setMessages}
-                      refreshMessages={fetchMessagesForGroup}
-                      selectedStudyGroup={selectedStudyGroup}
-                    />
-                    <ChatMessages
-                      messages={messages}
-                      setMessages={setMessages}
-                    />
-                  </div>
-                </div>
+                <StudyGroups
+                  selectedStudyGroup={selectedStudyGroup}
+                  setSelectedStudyGroup={setSelectedStudyGroup}
+                />
+                <SendMessageForm
+                  messages={messages}
+                  setMessages={setMessages}
+                  refreshMessages={fetchMessagesForGroup}
+                  selectedStudyGroup={selectedStudyGroup}
+                />
+                <ChatMessages messages={messages} setMessages={setMessages} />
               </>
             ) : (
-              <div className={styles.label}>strive</div>
+              <>
+                <div className={styles.welcome}>
+                  <p>Succeed Together <br></br>Join virtual study groups tailord to your subjects and thrive together</p>
+                  <div className={styles.welcomeSignUp}>
+                    <SignUpButton />
+                  </div>
+                </div>
+              <div className ={styles.descriptions}>
+                    <p>Dive into seamless collaboration <br></br>with integrated video sessions, <br></br>whiteboards
+                      , and chat. Turn<br></br>study hours into interactive <br></br>brainstorming sessions
+                    </p>
+                    <p>Discover groups that match <br></br>your courses and interests.<br></br>
+                      Whether it's calculus or<br></br>classis literature, there's a<br></br>
+                      squad waiting for you.
+                    </p>
+                    <p>Success a trasure trove of <br></br>shard notes, practice papers<br></br>
+                      and study materials. Every<br></br>group member contributes,<br></br>and everyone benefits!
+                    </p>
+                  
+                </div>  
+              </>
+              
             )}
           </div>
         </main>
@@ -372,15 +319,20 @@ const Header = () => {
 
   return (
     <header className={styles.header}>
-      <div>Strive</div>
+      <img src="strive\public\strive_logo.png" alt="Strive Logo"></img>
       {isSignedIn ? (
         <UserButton />
       ) : (
         <div>
-          <SignInButton />
-          &nbsp;
-          <SignUpButton />
+          <div className={styles.accountIn}>
+            <SignInButton />
+          </div>
+            &nbsp;
+          <div className={styles.accountUp}>
+            <SignUpButton />
+          </div>
         </div>
+        
       )}
     </header>
   );
