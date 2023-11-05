@@ -168,37 +168,9 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
     };
 
     fetchGroups();
+    const intervalId = setInterval(fetchGroups, 1000);
+    return () => clearInterval(intervalId);
   }, [userId, setSelectedStudyGroup]);
-
-  const joinGroup = async (groupId) => {
-    const supabaseAccessToken = await getToken({ template: "supabase" });
-    const supabase = await supabaseClient(supabaseAccessToken);
-
-    // Check if the user is already enrolled in the study group
-    const { data, error } = await supabase
-      .from("enrollment")
-      .select("*")
-      .eq("user_id", userId)
-      .eq("study_group", groupId);
-
-    if (error) {
-      console.error("Error fetching enrollment:", error);
-      return;
-    }
-
-    // If the user is already enrolled, notify and exit
-    if (data && data.length > 0) {
-      console.warn("User is already a member of this study group.");
-      return;
-    }
-
-    // If the user is not already enrolled, add them to the study group
-    await supabase
-      .from("enrollment")
-      .insert({ user_id: userId, study_group: groupId });
-
-    setUserGroups([...userGroups, groupId]);
-  };
 
   const leaveGroup = async (groupId) => {
     console.log("Attempting to leave group with ID:", groupId);
@@ -295,6 +267,77 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
           </Menu>
         </SidebarContent>
       </ProSidebar>
+    </div>
+  );
+}
+
+function CreateGroupForm() {
+  const { getToken, userId } = useAuth();
+  const [groupName, setGroupName] = useState("");
+  const [showForm, setShowForm] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const supabaseAccessToken = await getToken({ template: "supabase" });
+      const supabase = await supabaseClient(supabaseAccessToken);
+
+      let { error } = await supabase
+        .from("study_group")
+        .insert([{ name: groupName }]);
+
+      if (error) throw error;
+
+      // Step 2: Add the user to the enrollment table with the new group ID
+      let { data: groups, error: fetchError } = await supabase
+        .from("study_group")
+        .select("id")
+        .eq("name", groupName)
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      if (fetchError) throw fetchError;
+      if (!groups || groups.length === 0) {
+        throw new Error("New group was not found.");
+      }
+      const newGroupId = groups[0].id;
+
+      let { error: joinError } = await supabase
+        .from("enrollment")
+        .insert([{ study_group: newGroupId, user_id: userId }]);
+
+      if (joinError) throw joinError;
+
+      // If everything is successful, clear the form
+      setGroupName("");
+      setShowForm(false);
+    } catch (error) {
+      console.error("Error during group creation and joining:", error);
+    }
+  };
+
+  const show = () => {
+    setShowForm(!showForm);
+  };
+
+  return (
+    <div>
+      <button onClick={show}>Create Group</button>
+      {showForm && (
+        <form onSubmit={handleSubmit}>
+          <label>
+            Enter name of group:
+            <input
+              type="text"
+              name="name"
+              value={groupName}
+              onChange={(e) => setGroupName(e.target.value)}
+            />
+          </label>
+          <button type="submit">Create</button>
+        </form>
+      )}
     </div>
   );
 }
@@ -491,6 +534,7 @@ export default function Home() {
                       onClose={toggleSearch}
                     />
                   </div>
+                  <CreateGroupForm />
                 </div>
               </>
             ) : (
