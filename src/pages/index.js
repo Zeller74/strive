@@ -1,5 +1,6 @@
 import styles from "../styles/Home.module.css";
 import { useState, useEffect, useRef } from "react";
+import Modal from 'react-modal';
 
 import {
   useAuth,
@@ -41,6 +42,60 @@ const supabaseClient = async (supabaseAccessToken) => {
   );
 
   return supabase;
+};
+
+const SearchGroups = ({ getToken, isVisible, onClose }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [groups, setGroups] = useState([]);
+
+  useEffect(() => {
+    const fetchGroups = async () => {
+      const supabaseAccessToken = await getToken({ template: "supabase" });
+      const supabase = await supabaseClient(supabaseAccessToken);
+
+      const { data: allGroupsData } = await supabase
+        .from('study_group')
+        .select('*');
+
+      setGroups(allGroupsData);
+    };
+
+    if (isVisible) {
+      fetchGroups();
+    }
+  }, [isVisible]);
+
+  const filteredGroups = searchTerm
+    ? groups.filter((group) =>
+        group.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : groups;
+
+  const joinGroup = async (groupId) => {
+    // Functionality to join a group
+  };
+
+  if (!isVisible) return null;
+
+  return (
+    <div className="search-container">
+      <button onClick={onClose}>Close</button>
+      <input
+        type="text"
+        placeholder="Search groups..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      <div className="group-list">
+        {filteredGroups.map((group) => (
+          <div key={group.id} className="group-item">
+            {group.name}
+            <button onClick={() => joinGroup(group.id)}>Join</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 };
 
 const ChatMessages = ({ messages, setMessages }) => {
@@ -281,6 +336,13 @@ export default function Home() {
   const [messages, setMessages] = useState([]);
   const { getToken, userId } = useAuth();
   const [selectedStudyGroup, setSelectedStudyGroup] = useState(0); // State for the selected group
+  const [isSearchVisible, setSearchVisible] = useState(false);
+
+  // Function to handle opening and closing the search section
+  const toggleSearch = () => {
+    setSearchVisible(!isSearchVisible);
+  };
+
 
   async function fetchMessagesForGroup() {
     const supabaseAccessToken = await getToken({ template: "supabase" });
@@ -391,6 +453,16 @@ export default function Home() {
                       setMessages={setMessages}
                     />
                   </div>
+                  <button onClick={toggleSearch}>Find Group</button>
+
+      {/* Search Section */}
+      <div style={{ display: isSearchVisible ? 'block' : 'none' }}>
+        <SearchGroups
+          getToken={getToken}
+          isVisible={isSearchVisible}
+          onClose={toggleSearch}
+        />
+      </div>
                 </div>
               </>
             ) : (
