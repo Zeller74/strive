@@ -236,6 +236,7 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
                         : ""
                     }
                     onClick={() => handleClick(group.id)}
+                    
                     >
                       {group.name}
                       <Button
