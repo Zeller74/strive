@@ -1,6 +1,5 @@
 import styles from "../styles/Home.module.css";
 import { useState, useEffect, useRef } from "react";
-import Modal from "react-modal";
 
 import {
   useAuth,
@@ -21,17 +20,11 @@ import {
   SidebarHeader,
   SidebarContent,
 } from "react-pro-sidebar";
+import { Button } from '@mui/material'
 
 //import icons from react icons
-import { FaList, FaRegHeart } from "react-icons/fa";
-import {
-  FiHome,
-  FiLogOut,
-  FiArrowLeftCircle,
-  FiArrowRightCircle,
-} from "react-icons/fi";
-import { RiPencilLine } from "react-icons/ri";
-import { BiCog } from "react-icons/bi";
+import { FaRegHeart } from "react-icons/fa";
+import { FiArrowLeftCircle, FiArrowRightCircle } from "react-icons/fi";
 
 //import sidebar css from react-pro-sidebar module and our custom css
 import "react-pro-sidebar/dist/css/styles.css";
@@ -235,23 +228,28 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
 
   return (
     <div id="header">
-      <ProSidebar collapsed={menuCollapse}>
-        <SidebarHeader>
-          <div className="logotext">
-            <p>{menuCollapse ? "Groups" : "Groups"}</p>
-          </div>
-          <div className="closemenu" onClick={menuIconClick}>
-            {menuCollapse ? <FiArrowRightCircle /> : <FiArrowLeftCircle />}
-          </div>
-        </SidebarHeader>
-        <SidebarContent>
-          <Menu iconShape="square">
-            {userGroups.map((groupId) => {
+    <ProSidebar collapsed={menuCollapse}>
+      <SidebarHeader>
+      <div className="logotext">
+          <p>{menuCollapse ? "" : "Groups"}</p>
+        </div>
+        <div className="closemenu" onClick={menuIconClick}>
+          {menuCollapse ? (
+            <FiArrowRightCircle/>
+          ) : (
+            <FiArrowLeftCircle/>
+          )}
+        </div>
+      </SidebarHeader>
+      <SidebarContent>
+        <Menu iconShape="square">
+          {userGroups.map((groupId) => {
               const group = groups.find((g) => g.id === groupId);
               if (!group) return null;
               return (
-                <div key={group.id}>
-                  <MenuItem
+                <li>
+                  <div key={group.id}>
+                    <MenuItem
                     icon={<FaRegHeart />}
                     className={
                       selectedStudyGroup === group.id
@@ -259,31 +257,45 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
                         : ""
                     }
                     onClick={() => handleClick(group.id)}
-                  >
-                    {group.name}
-                  </MenuItem>
-                </div>
+                    >
+                      {group.name}
+                      <Button
+                      sx={{ m: 1 }}
+                      onClick={() => leaveGroup(group.id)}
+                      variant="contained"
+                      size="small"
+                      style={{maxWidth: '50px', maxHeight: '25px', minWidth: '50px', minHeight: '25px'}}
+                      >
+                        <p>{menuCollapse ? "" : "Leave"}</p>
+                      </Button>
+                    </MenuItem>
+                  </div>
+                </li>
               );
             })}
-            <ul>
-              {groups.map((group) => (
-                <li key={group.id}>
-                  {userGroups.includes(group.id) ? (
-                    <MenuItem onClick={() => leaveGroup(group.id)}>
-                      Leave {group.name}
-                    </MenuItem>
-                  ) : (
-                    <MenuItem onClick={() => joinGroup(group.id)}>
-                      Join {group.name}
-                    </MenuItem>
-                  )}
-                </li>
-              ))}
-            </ul>
-          </Menu>
-        </SidebarContent>
-      </ProSidebar>
-    </div>
+            {/* <ul>
+            {groups.map((group) => (
+              <li key={group.id}>
+                {userGroups.includes(group.id) ? (
+                  <MenuItem
+                    onClick={() => leaveGroup(group.id)}
+                  >
+                    Leave {group.name}
+                  </MenuItem>
+                ) : (
+                  <MenuItem
+                    onClick={() => joinGroup(group.id)}
+                  >
+                    Join {group.name}
+                  </MenuItem>
+                )}
+              </li>
+            ))}
+          </ul> */}
+        </Menu>
+      </SidebarContent>
+    </ProSidebar>
+</div>
   );
 }
 
@@ -336,16 +348,17 @@ function SendMessageForm({
     refreshMessages();
   };
 
-  return (
-    <form className={styles.sendMessageForm} onSubmit={handleSubmit}>
-      <input
-        className={styles.chatInput}
-        onChange={(e) => setNewMessage(e.target.value)}
-        value={newMessage}
-      />
-      <button className={styles.sendButton}>Send</button>
-    </form>
-  );
+return (
+  <form className={styles.sendMessageForm} onSubmit={handleSubmit}>
+    <input
+      className={styles.chatInput}
+      onChange={(e) => setNewMessage(e.target.value)}
+      value={newMessage}
+    />
+    <button className={styles.sendButton}>Send</button>
+  </form>
+);
+
 }
 
 export default function Home() {
@@ -467,6 +480,18 @@ export default function Home() {
                     <ChatMessages
                       messages={messages}
                       setMessages={setMessages}
+                    />
+                  </div>
+                  <button onClick={toggleSearch}>Find Group</button>
+
+      {/* Search Section */}
+      <div style={{ display: isSearchVisible ? 'block' : 'none' }}>
+        <SearchGroups
+          getToken={getToken}
+          isVisible={isSearchVisible}
+          onClose={toggleSearch}
+        />
+      </div>
                     />
                   </div>
                   <button onClick={toggleSearch}>Find Group</button>
