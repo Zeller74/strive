@@ -12,6 +12,25 @@ import {
 
 import { createClient } from "@supabase/supabase-js";
 
+//import react pro sidebar components
+import {
+  ProSidebar,
+  Menu,
+  MenuItem,
+  SidebarHeader,
+  SidebarContent,
+} from "react-pro-sidebar";
+
+//import icons from react icons
+import { FaList, FaRegHeart } from "react-icons/fa";
+import { FiHome, FiLogOut, FiArrowLeftCircle, FiArrowRightCircle } from "react-icons/fi";
+import { RiPencilLine } from "react-icons/ri";
+import { BiCog } from "react-icons/bi";
+
+
+//import sidebar css from react-pro-sidebar module and our custom css 
+import "react-pro-sidebar/dist/css/styles.css";
+
 const supabaseClient = async (supabaseAccessToken) => {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -124,59 +143,74 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
     setSelectedStudyGroup(groupId);
   };
 
+  //create initial menuCollapse state using useState hook
+  const [menuCollapse, setMenuCollapse] = useState(false)
+
+  //create a custom function that will change menucollapse state from false to true and true to false
+  const menuIconClick = () => {
+  //condition checking to change state from true to false and vice versa
+  menuCollapse ? setMenuCollapse(false) : setMenuCollapse(true);
+  };
+  
   return (
-    <div>
-      <h3>
-        Currently Viewing:{" "}
-        {groups.find((g) => g.id === selectedStudyGroup)?.name ||
-          "Select a Study Group"}
-      </h3>
-
-      <div className={styles.studyGroupSidebar}>
-        {userGroups.map((groupId) => {
-          const group = groups.find((g) => g.id === groupId);
-          if (!group) return null;
-          return (
-            <div key={group.id} className="studyGroupItem">
-              <button
-                className={`${styles.studyGroupButton} ${
-                  selectedStudyGroup === group.id
-                    ? styles.selectedStudyGroup
-                    : ""
-                }`}
-                onClick={() => handleClick(group.id)}
-              >
-                {group.name}
-              </button>
-            </div>
-          );
-        })}
-      </div>
-
-      <h3>All Study Groups:</h3>
-      <ul>
-        {groups.map((group) => (
-          <li key={group.id}>
-            {group.name}
-            {userGroups.includes(group.id) ? (
-              <button
-                className={styles.leaveButton}
-                onClick={() => leaveGroup(group.id)}
-              >
-                Leave
-              </button>
-            ) : (
-              <button
-                className={styles.joinButton}
-                onClick={() => joinGroup(group.id)}
-              >
-                Join
-              </button>
-            )}
-          </li>
-        ))}
-      </ul>
-    </div>
+    <div id="header">
+    <ProSidebar collapsed={menuCollapse}>
+      <SidebarHeader>
+      <div className="logotext">
+          <p>{menuCollapse ? "Groups" : "Groups"}</p>
+        </div>
+        <div className="closemenu" onClick={menuIconClick}>
+          {menuCollapse ? (
+            <FiArrowRightCircle/>
+          ) : (
+            <FiArrowLeftCircle/>
+          )}
+        </div>
+      </SidebarHeader>
+      <SidebarContent>
+        <Menu iconShape="square">
+          {userGroups.map((groupId) => {
+              const group = groups.find((g) => g.id === groupId);
+              if (!group) return null;
+              return (
+                <div key={group.id}>
+                  <MenuItem
+                    icon={<FaRegHeart />}
+                    className={
+                      selectedStudyGroup === group.id
+                        ? styles.selectedStudyGroup
+                        : ""
+                    }
+                    onClick={() => handleClick(group.id)}
+                  >
+                    {group.name}
+                  </MenuItem>
+                </div>
+              );
+            })}
+            <ul>
+            {groups.map((group) => (
+              <li key={group.id}>
+                {userGroups.includes(group.id) ? (
+                  <MenuItem
+                    onClick={() => leaveGroup(group.id)}
+                  >
+                    Leave {group.name}
+                  </MenuItem>
+                ) : (
+                  <MenuItem
+                    onClick={() => joinGroup(group.id)}
+                  >
+                    Join {group.name}
+                  </MenuItem>
+                )}
+              </li>
+            ))}
+          </ul>
+        </Menu>
+      </SidebarContent>
+    </ProSidebar>
+</div>
   );
 }
 
