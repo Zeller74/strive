@@ -1,5 +1,5 @@
 import styles from "../styles/Home.module.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 import {
   useAuth,
@@ -44,15 +44,24 @@ const supabaseClient = async (supabaseAccessToken) => {
 };
 
 const ChatMessages = ({ messages, setMessages }) => {
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      container.scrollTop = container.scrollHeight;
+    }
+  }, [messages]);
+
   return (
-    <>
+    <div className="chatContainer" ref={containerRef}>
       {messages?.filter(Boolean).map((message) => (
         <div key={message.id}>
           <strong>{message.user?.name ?? "Unknown User"}</strong>:{" "}
           {message?.text ?? "Message not available"}
         </div>
       ))}
-    </>
+    </div>
   );
 };
 
@@ -65,37 +74,62 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
     const fetchGroups = async () => {
       const supabaseAccessToken = await getToken({ template: "supabase" });
       const supabase = await supabaseClient(supabaseAccessToken);
-  
+
       // Fetch all study groups
       const { data: allGroupsData } = await supabase
         .from("study_group")
         .select("*");
-  
+
       // Fetch only the study groups where the user is enrolled
       const { data: userEnrollments } = await supabase
         .from("enrollment")
         .select("study_group")
         .eq("user_id", userId);
-  
-      setGroups(allGroupsData);  // This will set the list of ALL study groups
-      setUserGroups(userEnrollments.map(e => e.study_group));  // This will set only the ones user is part of
-    };
-    
-    fetchGroups();
-  }, [userId]);
-  
 
+      setGroups(allGroupsData); // This will set the list of ALL study groups
+      setUserGroups(userEnrollments.map((e) => e.study_group)); // This will set only the ones user is part of
+
+      if (userEnrollments.length > 0) {
+        setSelectedStudyGroup(userEnrollments[0].study_group);
+      }
+    };
+
+    fetchGroups();
+  }, [userId, setSelectedStudyGroup]);
 
   const joinGroup = async (groupId) => {
     const supabaseAccessToken = await getToken({ template: "supabase" });
     const supabase = await supabaseClient(supabaseAccessToken);
+
+    // Check if the user is already enrolled in the study group
+    const { data, error } = await supabase
+      .from("enrollment")
+      .select("*")
+      .eq("user_id", userId)
+      .eq("study_group", groupId);
+
+    if (error) {
+      console.error("Error fetching enrollment:", error);
+      return;
+    }
+
+    // If the user is already enrolled, notify and exit
+    if (data && data.length > 0) {
+      console.warn("User is already a member of this study group.");
+      return;
+    }
+
+    // If the user is not already enrolled, add them to the study group
     await supabase
       .from("enrollment")
       .insert({ user_id: userId, study_group: groupId });
+
     setUserGroups([...userGroups, groupId]);
   };
 
   const leaveGroup = async (groupId) => {
+    console.log("Attempting to leave group with ID:", groupId);
+
     const supabaseAccessToken = await getToken({ template: "supabase" });
     const supabase = await supabaseClient(supabaseAccessToken);
     await supabase
@@ -180,7 +214,12 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
   );
 }
 
-function SendMessageForm({ messages, setMessages, refreshMessages, selectedStudyGroup }) {
+function SendMessageForm({
+  messages,
+  setMessages,
+  refreshMessages,
+  selectedStudyGroup,
+}) {
   const { getToken, userId } = useAuth();
   const [newMessage, setNewMessage] = useState("");
   const { session } = useSession();
@@ -252,7 +291,7 @@ export default function Home() {
       .from("message")
       .select("*")
       .match({ study_group: selectedStudyGroup })
-      .order("id", { ascending: false });
+      .order("id", { ascending: true });
 
     if (error1) {
       console.error("Error fetching group messages:", error1);
@@ -327,22 +366,32 @@ export default function Home() {
       {isLoading ? (
         <></>
       ) : (
-        <main  >
+        <main className={styles.main}>
           <div className={styles.container}>
             {isSignedIn ? (
               <>
                 <div className={styles.label}>Welcome {user.firstName}!</div>
-                <StudyGroups
-                  selectedStudyGroup={selectedStudyGroup}
-                  setSelectedStudyGroup={setSelectedStudyGroup}
-                />
-                <SendMessageForm
-                  messages={messages}
-                  setMessages={setMessages}
-                  refreshMessages={fetchMessagesForGroup}
-                  selectedStudyGroup={selectedStudyGroup}
-                />
-                <ChatMessages messages={messages} setMessages={setMessages} />
+                <div className={styles.studyGroupContainer}>
+                  {/* Sidebar with study groups on the left */}
+                  <StudyGroups
+                    selectedStudyGroup={selectedStudyGroup}
+                    setSelectedStudyGroup={setSelectedStudyGroup}
+                  />
+
+                  {/* Chat and message form on the right */}
+                  <div className={styles.chatContainer}>
+                    <SendMessageForm
+                      messages={messages}
+                      setMessages={setMessages}
+                      refreshMessages={fetchMessagesForGroup}
+                      selectedStudyGroup={selectedStudyGroup}
+                    />
+                    <ChatMessages
+                      messages={messages}
+                      setMessages={setMessages}
+                    />
+                  </div>
+                </div>
               </>
             ) : (
               <>
@@ -366,7 +415,6 @@ export default function Home() {
                   
                 </div>  
               </>
-              
             )}
           </div>
         </main>
@@ -380,20 +428,15 @@ const Header = () => {
 
   return (
     <header className={styles.header}>
-      <img src="strive\public\strive_logo.png" alt="Strive Logo"></img>
+      <div>Strive</div>
       {isSignedIn ? (
         <UserButton />
       ) : (
         <div>
-          <div className={styles.accountIn}>
-            <SignInButton />
-          </div>
-            &nbsp;
-          <div className={styles.accountUp}>
-            <SignUpButton />
-          </div>
+          <SignInButton />
+          &nbsp;
+          <SignUpButton />
         </div>
-        
       )}
     </header>
   );
