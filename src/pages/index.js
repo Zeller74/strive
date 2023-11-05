@@ -142,6 +142,7 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
   const { getToken, userId } = useAuth();
   const [groups, setGroups] = useState([]);
   const [userGroups, setUserGroups] = useState([]);
+  const [isInitialGroupSet, setIsInitialGroupSet] = useState(false); // New state variable
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -162,15 +163,19 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
       setGroups(allGroupsData); // This will set the list of ALL study groups
       setUserGroups(userEnrollments.map((e) => e.study_group)); // This will set only the ones user is part of
 
-      if (userEnrollments.length > 0) {
+      if (!isInitialGroupSet && userEnrollments.length > 0) {
         setSelectedStudyGroup(userEnrollments[0].study_group);
+        setIsInitialGroupSet(true); // Set the flag to true after setting the initial group
       }
     };
 
     fetchGroups();
     const intervalId = setInterval(fetchGroups, 1000);
-    return () => clearInterval(intervalId);
-  }, [userId, setSelectedStudyGroup]);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [userId, setSelectedStudyGroup, isInitialGroupSet]);
 
   const leaveGroup = async (groupId) => {
     console.log("Attempting to leave group with ID:", groupId);
