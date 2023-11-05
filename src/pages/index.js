@@ -20,7 +20,7 @@ import {
   SidebarHeader,
   SidebarContent,
 } from "react-pro-sidebar";
-import { Button } from '@mui/material'
+import { Button } from "@mui/material";
 
 //import icons from react icons
 import { FaRegHeart } from "react-icons/fa";
@@ -41,9 +41,9 @@ const supabaseClient = async (supabaseAccessToken) => {
   return supabase;
 };
 
-const SearchGroups = ({ isVisible, onClose}) => {
+const SearchGroups = ({ isVisible, onClose }) => {
   const { getToken, userId } = useAuth();
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [groups, setGroups] = useState([]);
   const [userGroups, setUserGroups] = useState([]); // To store the user's groups
 
@@ -56,15 +56,15 @@ const SearchGroups = ({ isVisible, onClose}) => {
 
       // Fetch all groups
       const { data: allGroupsData } = await supabase
-        .from('study_group')
-        .select('*');
+        .from("study_group")
+        .select("*");
       setGroups(allGroupsData);
 
       // Fetch the groups the user is a member of
       const { data: userGroupsData } = await supabase
-        .from('enrollment')
-        .select('study_group')
-        .eq('user_id', userId);
+        .from("enrollment")
+        .select("study_group")
+        .eq("user_id", userId);
       setUserGroups(userGroupsData.map((enrollment) => enrollment.study_group));
     };
 
@@ -115,7 +115,6 @@ const SearchGroups = ({ isVisible, onClose}) => {
     </div>
   );
 };
-
 
 const ChatMessages = ({ messages, setMessages }) => {
   const containerRef = useRef(null);
@@ -228,43 +227,44 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
 
   return (
     <div id="header">
-    <ProSidebar collapsed={menuCollapse}>
-      <SidebarHeader>
-      <div className="logotext">
-          <p>{menuCollapse ? "" : "Groups"}</p>
-        </div>
-        <div className="closemenu" onClick={menuIconClick}>
-          {menuCollapse ? (
-            <FiArrowRightCircle/>
-          ) : (
-            <FiArrowLeftCircle/>
-          )}
-        </div>
-      </SidebarHeader>
-      <SidebarContent>
-        <Menu iconShape="square">
-          {userGroups.map((groupId) => {
+      <ProSidebar collapsed={menuCollapse}>
+        <SidebarHeader>
+          <div className="logotext">
+            <p>{menuCollapse ? "" : "Groups"}</p>
+          </div>
+          <div className="closemenu" onClick={menuIconClick}>
+            {menuCollapse ? <FiArrowRightCircle /> : <FiArrowLeftCircle />}
+          </div>
+        </SidebarHeader>
+        <SidebarContent>
+          <Menu iconShape="square">
+            {userGroups.map((groupId) => {
               const group = groups.find((g) => g.id === groupId);
               if (!group) return null;
               return (
                 <li>
                   <div key={group.id}>
                     <MenuItem
-                    icon={<FaRegHeart />}
-                    className={
-                      selectedStudyGroup === group.id
-                        ? styles.selectedStudyGroup
-                        : ""
-                    }
-                    onClick={() => handleClick(group.id)}
+                      icon={<FaRegHeart />}
+                      className={
+                        selectedStudyGroup === group.id
+                          ? styles.selectedStudyGroup
+                          : ""
+                      }
+                      onClick={() => handleClick(group.id)}
                     >
                       {group.name}
                       <Button
-                      sx={{ m: 1 }}
-                      onClick={() => leaveGroup(group.id)}
-                      variant="contained"
-                      size="small"
-                      style={{maxWidth: '50px', maxHeight: '25px', minWidth: '50px', minHeight: '25px'}}
+                        sx={{ m: 1 }}
+                        onClick={() => leaveGroup(group.id)}
+                        variant="contained"
+                        size="small"
+                        style={{
+                          maxWidth: "50px",
+                          maxHeight: "25px",
+                          minWidth: "50px",
+                          minHeight: "25px",
+                        }}
                       >
                         <p>{menuCollapse ? "" : "Leave"}</p>
                       </Button>
@@ -292,10 +292,10 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
               </li>
             ))}
           </ul> */}
-        </Menu>
-      </SidebarContent>
-    </ProSidebar>
-</div>
+          </Menu>
+        </SidebarContent>
+      </ProSidebar>
+    </div>
   );
 }
 
@@ -348,17 +348,16 @@ function SendMessageForm({
     refreshMessages();
   };
 
-return (
-  <form className={styles.sendMessageForm} onSubmit={handleSubmit}>
-    <input
-      className={styles.chatInput}
-      onChange={(e) => setNewMessage(e.target.value)}
-      value={newMessage}
-    />
-    <button className={styles.sendButton}>Send</button>
-  </form>
-);
-
+  return (
+    <form className={styles.sendMessageForm} onSubmit={handleSubmit}>
+      <input
+        className={styles.chatInput}
+        onChange={(e) => setNewMessage(e.target.value)}
+        value={newMessage}
+      />
+      <button className={styles.sendButton}>Send</button>
+    </form>
+  );
 }
 
 export default function Home() {
@@ -484,21 +483,10 @@ export default function Home() {
                   </div>
                   <button onClick={toggleSearch}>Find Group</button>
 
-      {/* Search Section */}
-      <div style={{ display: isSearchVisible ? 'block' : 'none' }}>
-        <SearchGroups
-          getToken={getToken}
-          isVisible={isSearchVisible}
-          onClose={toggleSearch}
-        />
-      </div>
-                    />
-                  </div>
-                  <button onClick={toggleSearch}>Find Group</button>
-
                   {/* Search Section */}
                   <div style={{ display: isSearchVisible ? "block" : "none" }}>
                     <SearchGroups
+                      getToken={getToken}
                       isVisible={isSearchVisible}
                       onClose={toggleSearch}
                     />
@@ -506,38 +494,7 @@ export default function Home() {
                 </div>
               </>
             ) : (
-              <>
-                <div className={styles.welcome}>
-                  <p>
-                    Succeed Together <br></br>Join virtual study groups tailord
-                    to your subjects and thrive together
-                  </p>
-                  <div className={styles.welcomeSignUp}>
-                    <SignUpButton />
-                  </div>
-                </div>
-                <div className={styles.descriptions}>
-                  <p>
-                    Dive into seamless collaboration <br></br>with integrated
-                    video sessions, <br></br>whiteboards , and chat. Turn
-                    <br></br>study hours into interactive <br></br>brainstorming
-                    sessions
-                  </p>
-                  <p>
-                    Discover groups that match <br></br>your courses and
-                    interests.<br></br>
-                    Whether it's calculus or<br></br>classis literature, there's
-                    a<br></br>
-                    squad waiting for you.
-                  </p>
-                  <p>
-                    Success a trasure trove of <br></br>shard notes, practice
-                    papers<br></br>
-                    and study materials. Every<br></br>group member contributes,
-                    <br></br>and everyone benefits!
-                  </p>
-                </div>
-              </>
+              <div className={styles.label}>strive</div>
             )}
           </div>
         </main>
