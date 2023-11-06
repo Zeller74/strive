@@ -7,7 +7,8 @@
 .header {
   padding: 1rem 2rem;
   height: 4rem;
-  background-color: lightgray;
+  background-color: #0077b6;
+  color:#ffffff;
   width: 100%;
   display: flex;
   justify-content: space-between;
@@ -39,6 +40,8 @@
     overflow-y: auto; /* Make it scrollable */
     height: 600px; /* Adjust as per your needs */
     width: 60%;
+    border-width: thin;
+    border-color:#000;
     margin-left: 22%;
     margin-top: 2%;
     background-color: rgb(224, 224, 224);
@@ -128,6 +131,35 @@
     /* Other styling properties if you need, like change in font color, border, etc. */
   }
   
+  .createGroupInput{
+    margin: 0 auto;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 10px;
+    background-color: #d6d2c9;
+  }
+
+  .createButton{
+    display: block;
+    padding: 5px 5px;
+    background-color: #0077b6;
+    border-radius: 4px;
+    color: #ffffff;
+    height: 60px;
+    width: 100px;
+    border-width: thin
+  }
+
+  .searchButton{
+    padding: 5px 5px;
+    background-color: #0077b6;
+    border-radius: 4px;
+    color: #ffffff;
+    height: auto;
+    width: auto;
+    border-width: thin
+  }
+
   .accountIn{
 display: grid;
 place-content: center;

@@ -95,7 +95,7 @@ const SearchGroups = ({ isVisible, onClose }) => {
 
   return (
     <div className="search-container">
-      <button onClick={onClose}>Close</button>
+      <button className={styles.searchButton} onClick={onClose}>Close</button>
       <input
         type="text"
         placeholder="Search groups..."
@@ -107,7 +107,7 @@ const SearchGroups = ({ isVisible, onClose }) => {
           <div key={group.id} className="group-item">
             {group.name}
             {!isUserMember(group.id) && (
-              <button onClick={() => joinGroup(group.id)}>Join</button>
+              <button className={styles.searchButton} onClick={() => joinGroup(group.id)}>Join</button>
             )}
           </div>
         ))}
@@ -328,9 +328,9 @@ function CreateGroupForm() {
 
   return (
     <div>
-      <button onClick={show}>Create Group</button>
+      <button className={styles.createButton} onClick={show}>Create Group</button>
       {showForm && (
-        <form onSubmit={handleSubmit}>
+        <form className={styles.createGroupInput} onSubmit={handleSubmit}>
           <label>
             Enter name of group:
             <input
@@ -340,7 +340,7 @@ function CreateGroupForm() {
               onChange={(e) => setGroupName(e.target.value)}
             />
           </label>
-          <button type="submit">Create</button>
+          <button className={styles.createButton} type="submit">Create</button>
         </form>
       )}
     </div>
@@ -529,7 +529,7 @@ export default function Home() {
                       setMessages={setMessages}
                     />
                   </div>
-                  <button onClick={toggleSearch}>Find Group</button>
+
 
                   {/* Search Section */}
                   <div style={{ display: isSearchVisible ? "block" : "none" }}>
@@ -539,7 +539,10 @@ export default function Home() {
                       onClose={toggleSearch}
                     />
                   </div>
-                  <CreateGroupForm />
+                  <div>
+                    <button className={styles.createButton} onClick={toggleSearch}>Find Group</button>
+                    <CreateGroupForm />
+                    </div>
                 </div>
               </>
             ) : (
