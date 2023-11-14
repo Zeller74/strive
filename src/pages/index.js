@@ -555,17 +555,36 @@ export default function Home() {
                 </div>
               <div className ={styles.descriptions}>
                     <p>Dive into seamless collaboration <br></br>with integrated video sessions, <br></br>whiteboards
-                      , and chat. Turn<br></br>study hours into interactive <br></br>brainstorming sessions
+                    , and chat. Turn<br></br>study hours into interactive <br></br>brainstorming sessions
                     </p>
                     <p>Discover groups that match <br></br>your courses and interests.<br></br>
-                      Whether it's calculus or<br></br>classis literature, there's a<br></br>
-                      squad waiting for you.
+                      Whether it's calculus or<br></br>classis literature, there's <br></br>a squad waiting for you.
                     </p>
                     <p>Success a trasure trove of <br></br>shard notes, practice papers<br></br>
                       and study materials. Every<br></br>group member contributes,<br></br>and everyone benefits!
                     </p>
-
-                </div>  
+                </div>
+             
+                <footer className={styles.footer}>
+                      <div className={styles.footerContent}>
+                        <div className={styles.footerLeft}>
+                          <h3>About Us</h3>
+                          <p>Strive is a small team consisting of Hannah Nguyen, Jeffrey Yang, Joel Yates, Paul Adelae, and Rebecca Nguyen.
+                            Our goal is to assist students in their academic journies so that they may have all the tools necessary to thrive
+                            in their environment.
+                          </p>
+                        </div>
+                        <div className={styles.footerRight}>
+                          <h3>Contact Information</h3>
+                          <p>Hannah: hannahn2@umbc.edu<br></br>Jeffery: jyang13@umbc.edu<br></br>Joel: jyates1@umbc.edu<br></br> 
+                            Paul: padelae1@umbc.edu<br></br>Rebecca: xv46495@umbc.edu</p>
+        
+                        </div>
+                      </div>
+                      <div className={styles.footerBottom}>
+                        <p>&copy; 2023 Strive. All Rights Reserved.</p>
+                      </div>
+                    </footer> 
               </>
             )}
           </div>
