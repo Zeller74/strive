@@ -131,7 +131,7 @@ const ChatMessages = ({ messages, setMessages }) => {
       {messages?.filter(Boolean).map((message) => (
         <div key={message.id}>
           <strong>{message.user?.name ?? "Unknown User"}</strong>:{" "}
-          {message?.text ?? "Message not available"}
+          <span dangerouslySetInnerHTML={{ __html: message?.text }}></span>
         </div>
       ))}
     </div>
@@ -219,8 +219,8 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
               const group = groups.find((g) => g.id === groupId);
               if (!group) return null;
               return (
-                <li>
-                  <div key={group.id}>
+                <li key={group.id}>
+                  <div>
                     <MenuItem
                       icon={<FaRegHeart />}
                       className={
@@ -396,8 +396,90 @@ function SendMessageForm({
     refreshMessages();
   };
 
+  const [file, setFile] = useState(null);
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
+  };
+
+  const handleUpload = async () => {
+    if (!file) return;
+
+    const supabaseAccessToken = await getToken({ template: "supabase" });
+    const supabase = await supabaseClient(supabaseAccessToken);
+
+    const fileName = `${selectedStudyGroup}/${Date.now()}-${file.name}`;
+    const filePath = `${fileName}`;
+
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('studygroupfiles')
+      .upload(filePath, file);
+
+    if (uploadError) {
+      console.error('Error uploading file:', uploadError);
+      return;
+    }
+
+    // Get the public URL for the new file
+    const response = await supabase
+      .storage
+      .from('studygroupfiles')
+      .getPublicUrl(filePath);
+
+    if (response.error) {
+      console.error('Error getting file URL:', response.error);
+      return;
+    }
+
+    const publicURL = response.data.publicUrl;
+
+
+    // Add file info to `resource` table
+    const { error: dbError } = await supabase
+      .from('resource')
+      .insert({
+        path: publicURL,
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        study_group: selectedStudyGroup,
+        user_id: userId,
+      });
+
+    if (dbError) {
+      console.error('Error saving file info to database:', dbError);
+    }
+
+    const fileType = file.type.split('/')[0];
+
+    // Construct the message content based on file type
+    const messageContent = fileType === 'image'
+      ? `<img src="${publicURL}" alt="${file.name}"/>`
+      : `<a href="${publicURL}?download=" target="_blank" download style = "color: blue;">${file.name}</a>`;
+
+    // Send this message to the chat
+    const { error: messageError } = await supabase
+      .from('message')
+      .insert({
+        text: messageContent,
+        user_id: userId,
+        study_group: selectedStudyGroup,
+        // Additional fields like 'isFileMessage': true, 'fileUrl': url, if wanted
+      });
+
+    if (messageError) {
+      console.error('Error sending file message:', messageError);
+    }
+
+    refreshMessages();
+
+    setFile(null);
+  };
+
   return (
     <form className={styles.sendMessageForm} onSubmit={handleSubmit}>
+      <input type="file" onChange={handleFileChange} />
+      <button type="button" onClick={handleUpload}>Upload File</button>
       <input
         className={styles.chatInput}
         onChange={(e) => setNewMessage(e.target.value)}
@@ -471,7 +553,7 @@ export default function Home() {
       const { data: usersData, error } = await supabase
         .from("user")
         .select("name")
-        .eq("user_id", userId); // Using "user.id" directly
+        .eq("user_id", userId);
 
       if (error) {
         console.error("Error fetching user data:", error);
@@ -487,7 +569,7 @@ export default function Home() {
     }
 
     ensureUserInSupabase();
-  }, [isLoading, isSignedIn, user, getToken]); // Added dependencies here
+  }, [isLoading, isSignedIn, user, getToken]);
 
   useEffect(() => {
     fetchMessagesForGroup();
@@ -558,7 +640,7 @@ export default function Home() {
                     , and chat. Turn<br></br>study hours into interactive <br></br>brainstorming sessions
                   </p>
                   <p>Discover groups that match <br></br>your courses and interests.<br></br>
-                    Whether it's calculus or<br></br>classis literature, there's a<br></br>
+                    Whether it is calculus or<br></br>classis literature, there is s a<br></br>
                     squad waiting for you.
                   </p>
                   <p>Success a trasure trove of <br></br>shard notes, practice papers<br></br>
