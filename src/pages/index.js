@@ -87,8 +87,8 @@ const SearchGroups = ({ isVisible, onClose }) => {
 
   const filteredGroups = searchTerm
     ? groups.filter((group) =>
-        group.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      group.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     : groups;
 
   if (!isVisible) return null;
@@ -542,7 +542,7 @@ export default function Home() {
                   <div>
                     <button className={styles.createButton} onClick={toggleSearch}>Find Group</button>
                     <CreateGroupForm />
-                    </div>
+                  </div>
                 </div>
               </>
             ) : (
@@ -553,19 +553,19 @@ export default function Home() {
                     <SignUpButton />
                   </div>
                 </div>
-              <div className ={styles.descriptions}>
-                    <p>Dive into seamless collaboration <br></br>with integrated video sessions, <br></br>whiteboards
-                      , and chat. Turn<br></br>study hours into interactive <br></br>brainstorming sessions
-                    </p>
-                    <p>Discover groups that match <br></br>your courses and interests.<br></br>
-                      Whether it's calculus or<br></br>classis literature, there's a<br></br>
-                      squad waiting for you.
-                    </p>
-                    <p>Success a trasure trove of <br></br>shard notes, practice papers<br></br>
-                      and study materials. Every<br></br>group member contributes,<br></br>and everyone benefits!
-                    </p>
+                <div className={styles.descriptions}>
+                  <p>Dive into seamless collaboration <br></br>with integrated video sessions, <br></br>whiteboards
+                    , and chat. Turn<br></br>study hours into interactive <br></br>brainstorming sessions
+                  </p>
+                  <p>Discover groups that match <br></br>your courses and interests.<br></br>
+                    Whether it's calculus or<br></br>classis literature, there's a<br></br>
+                    squad waiting for you.
+                  </p>
+                  <p>Success a trasure trove of <br></br>shard notes, practice papers<br></br>
+                    and study materials. Every<br></br>group member contributes,<br></br>and everyone benefits!
+                  </p>
 
-                </div>  
+                </div>
               </>
             )}
           </div>
