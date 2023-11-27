@@ -170,7 +170,7 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
     };
 
     fetchGroups();
-    const intervalId = setInterval(fetchGroups, 1000);
+    const intervalId = setInterval(fetchGroups, 3000);
 
     return () => {
       clearInterval(intervalId);
