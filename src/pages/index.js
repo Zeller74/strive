@@ -664,7 +664,7 @@ const Header = () => {
     <header className={styles.header}>
       <div>Strive</div>
       {isSignedIn ? (
-        <UserButton />
+        <UserButton afterSignOutUrl="/" />
       ) : (
         <div>
           <SignInButton />
