@@ -375,6 +375,90 @@ function CreateGroupForm() {
   );
 }
 
+function CreateEventForm({ currentStudyGroup }) {
+  const { getToken, userId } = useAuth();
+  const [eventName, setEventName] = useState("");
+  const [eventDescription, setEventDescription] = useState("");
+  const [eventDate, setEventDate] = useState("");
+  const [showForm, setShowForm] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const supabaseAccessToken = await getToken({ template: "supabase" });
+      const supabase = await supabaseClient(supabaseAccessToken);
+
+      let { error } = await supabase
+        .from("events")
+        .insert([
+          {
+            name: eventName,
+            description: eventDescription,
+            date: eventDate,
+            study_group: currentStudyGroup
+          }
+        ]);
+
+      if (error) throw error;
+
+      // Clear the form
+      setEventName("");
+      setEventDescription("");
+      setEventDate("");
+      setShowForm(false);
+    } catch (error) {
+      console.error("Error during event creation:", error);
+    }
+  };
+
+  const show = () => {
+    setShowForm(!showForm);
+  };
+
+  return (
+    <div>
+      <button className={styles.createButton} onClick={show}>Create Event</button>
+      {showForm && (
+        <form className={styles.createEventInput} onSubmit={handleSubmit}>
+          <label>
+            Enter name of event:
+            <input
+              type="text"
+              name="name"
+              value={eventName}
+              onChange={(e) => setEventName(e.target.value)}
+            />
+          </label>
+          <br />
+          <label>
+            Enter description for event:
+            <input
+              type="text"
+              name="desc"
+              value={eventDescription}
+              onChange={(e) => setEventDescription(e.target.value)}
+            />
+          </label>
+          <br />
+          <label>
+            Enter date for event:
+            <input
+              type="date"
+              name="date"
+              value={eventDate}
+              onChange={(e) => setEventDate(e.target.value)}
+            />
+          </label>
+          <br />
+          <button className={styles.createButton} type="submit">Create</button>
+        </form>
+      )}
+    </div>
+  );
+}
+
+
 function SendMessageForm({
   messages,
   setMessages,
@@ -652,6 +736,7 @@ export default function Home() {
                   <div>
                     <button className={styles.createButton} onClick={toggleSearch}>Find Group</button>
                     <CreateGroupForm />
+                    <CreateEventForm currentStudyGroup={selectedStudyGroup} />
                   </div>
                 </div>
               </>

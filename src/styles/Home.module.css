@@ -140,6 +140,14 @@
   background-color: #d6d2c9;
 }
 
+.createEventInput {
+  margin: 0 auto;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  background-color: #d6d2c9;
+}
+
 .createButton {
   display: block;
   padding: 5px 5px;
