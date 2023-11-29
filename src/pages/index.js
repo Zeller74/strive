@@ -20,7 +20,7 @@ import {
   SidebarHeader,
   SidebarContent,
 } from "react-pro-sidebar";
-import { Button } from "@mui/material";
+import { Button, Box } from "@mui/material";
 
 //import icons from react icons
 import { FaRegHeart } from "react-icons/fa";
@@ -629,24 +629,46 @@ export default function Home() {
               </>
             ) : (
               <>
-                <div className={styles.welcome}>
-                  <p>Succeed Together <br></br>Join virtual study groups tailord to your subjects and thrive together</p>
+                <div className={styles.banner}>
                   <div className={styles.welcomeSignUp}>
-                    <SignUpButton />
+                    <div>
+                      <p className={styles.mainText}>
+                        Succeed Together.
+                      </p>
+                      <p style={{ textAlign: "center", marginLeft: 50, marginRight: 50 }}>
+                        Join virtual study groups tailored to your subjects and STRIVE for greatness
+                      </p>
+                      <div className={styles.signUpDiv}>
+                        <SignUpButton className={styles.signUp} />
+                      </div>
+                    </div>
                   </div>
+                  <img className={styles.image}
+                    src="https://i.imgur.com/jOH1c0q.png"
+                  />
                 </div>
                 <div className={styles.descriptions}>
-                  <p>Dive into seamless collaboration <br></br>with integrated video sessions, <br></br>whiteboards
-                    , and chat. Turn<br></br>study hours into interactive <br></br>brainstorming sessions
-                  </p>
-                  <p>Discover groups that match <br></br>your courses and interests.<br></br>
-                    Whether it is calculus or<br></br>classis literature, there is s a<br></br>
-                    squad waiting for you.
-                  </p>
-                  <p>Success a trasure trove of <br></br>shard notes, practice papers<br></br>
-                    and study materials. Every<br></br>group member contributes,<br></br>and everyone benefits!
-                  </p>
-
+                  <div style={{ marginLeft: 60, marginRight: 60 }}>
+                    <p className={styles.descriptionTitle}>Collaborative Learning Hub</p>
+                    <p className={styles.descriptionText}>
+                      Dive into seamless collaboration with video sessions, whiteboards, and chat.
+                      Turn study hours into interactive brainstorming sessions
+                    </p>
+                  </div>
+                  <img src="https://i.imgur.com/fqsGrnG.png" className={styles.line} />
+                  <div style={{ marginLeft: 60, marginRight: 60 }}>
+                    <p className={styles.descriptionTitle}>Tailored Study Groups</p>
+                    <p className={styles.descriptionText}>Discover groups that match your courses and interests.
+                      Whether it's calculus or classic literature, there's a squad waiting for you.
+                    </p>
+                  </div>
+                  <img src="https://i.imgur.com/fqsGrnG.png" className={styles.line} />
+                  <div style={{ marginLeft: 60, marginRight: 60 }}>
+                    <p className={styles.descriptionTitle}>Resource Central</p>
+                    <p className={styles.descriptionText}>Access a treasure trove of shared notes, practice papers
+                      and study materials. Every group member contributes, and everyone benefits!
+                    </p>
+                  </div>
                 </div>
               </>
             )}
@@ -662,12 +684,13 @@ const Header = () => {
 
   return (
     <header className={styles.header}>
-      <div>Strive</div>
+      <img src="https://i.imgur.com/8Dc5Svm.png" style={{ width: 25, float: "left" }}></img>
+      <div style={{ marginLeft: 20, float: "left" }}>STRIVE</div>
       {isSignedIn ? (
         <UserButton afterSignOutUrl="/" />
       ) : (
-        <div>
-          <SignInButton />
+        <div style={{ float: "right" }}>
+          <SignInButton style={{ marginRight: 20 }} />
           &nbsp;
           <SignUpButton />
         </div>

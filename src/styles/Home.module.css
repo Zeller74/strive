@@ -10,12 +10,12 @@
   background-color: #0077b6;
   color:#ffffff;
   width: 100%;
-  display: flex;
-  justify-content: space-between;
+  display: inline-block;
   align-items: center;
   height: auto;
   transition: background-color 0.5s ease;
 }
+
 .header:hover{
   background-color: rgb(0, 31, 41);
   color: white;
@@ -150,6 +150,11 @@
     border-width: thin
   }
 
+
+  .line{
+    width: 10px;
+  }
+
   .searchButton{
     padding: 5px 5px;
     background-color: #0077b6;
@@ -205,36 +210,54 @@ background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 1), rgba(0
 .welcome p{
 font-size: 35px;
 }
+
+.banner {
+display: flex;
+margin-bottom: -40px;
+}
+
+.image{
+flex:1;
+}
+
 .welcomeSignUp{
-height: 80px;
-width: 30%;
-display: grid;
-background: rgb(0, 31, 41);
+flex:1;
+background: rgb(0, 0, 0);
 color: white;
-border-radius: 9px;
-border-color: white;
-margin: auto;
-font-size: 35px;
 transition: background-color 0.5s ease;
-}
-.welcomeSignUp:hover{
-background: white;
-color: rgb(0, 31, 41);
-border-color: rgb(0, 31, 41);
-}
-.descriptions p{
-float: left;
-margin-right: 80px;
-margin-left: 80px;
-margin-top: 5px;
 text-align: center;
-font-size: 20px;
-transition: background-color 0.5s ease;
-border-radius: 9px;
+font-size: 25px;
 }
-.descriptions p:hover{
-color: white;
-background-color: rgb(0, 31, 41);
+
+.signUp{
+  background: rgb(79, 79, 79);
+  border-radius: 9%;
+  width:205px;
+  height:80px;
+  text-align: center;
+  font-size: 30px;
+  transition: background-color 0.5s ease;
+}
+
+.signUpDiv{
+  margin: 0;
+  position: absolute;
+  margin-top: 60px;
+  left: 25%;
+  -ms-transform: translate(-50%);
+  transform: translate(-50%);
+}
+
+.signUp:hover{
+  color: rgb(0, 0, 0);
+  background-color: rgb(231, 249, 255);
+  }
+
+.mainText{
+  font-weight: bold;
+  text-align: center;
+  font-size: 35px;
+  margin-top: 30px;
 }
 
 .descriptions{
@@ -243,6 +266,24 @@ height: 400px;
 display: flex;
 justify-content: center;
 align-items: center;
+}
+
+.descriptionText:hover{
+  border-radius: 9%;
+  color: #0077b6;
+}
+
+.descriptionText{
+  width: 300px;
+  text-align:left;
+  transition: color 0.5s ease;
+}
+
+.descriptionTitle{
+  font-weight: bold;
+  font-size: 20px;
+  text-align: left;
+  margin-bottom: 25px;
 }
 
 .label {
