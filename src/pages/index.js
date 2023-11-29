@@ -104,14 +104,18 @@ const SearchGroups = ({ isVisible, onClose }) => {
       />
       <div className="group-list">
         {filteredGroups.map((group) => (
-          <div key={group.id} className="group-item">
+          <div key={group.id} className={styles.groupItem}>
             {group.name}
+            <button className={styles.infoButton}>Info
+              <span className={styles.tooltip}>{group.description}</span>
+            </button>
             {!isUserMember(group.id) && (
               <button className={styles.searchButton} onClick={() => joinGroup(group.id)}>Join</button>
             )}
           </div>
         ))}
       </div>
+
     </div>
   );
 };
@@ -279,6 +283,7 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
 function CreateGroupForm() {
   const { getToken, userId } = useAuth();
   const [groupName, setGroupName] = useState("");
+  const [groupDescription, setGroupDescription] = useState("");
   const [showForm, setShowForm] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -288,17 +293,29 @@ function CreateGroupForm() {
       const supabaseAccessToken = await getToken({ template: "supabase" });
       const supabase = await supabaseClient(supabaseAccessToken);
 
+      const { data: existingGroups, error: groupError } = await supabase
+        .from("study_group")
+        .select("id")
+        .eq("name", groupName);
+
+      if (groupError) throw groupError;
+
+      if (existingGroups.length > 0) {
+        alert("A group with this name already exists.");
+        return;
+      }
+
       let { error } = await supabase
         .from("study_group")
-        .insert([{ name: groupName }]);
+        .insert([{ name: groupName, description: groupDescription }]);
 
       if (error) throw error;
 
-      // Step 2: Add the user to the enrollment table with the new group ID
       let { data: groups, error: fetchError } = await supabase
         .from("study_group")
         .select("id")
         .eq("name", groupName)
+        .eq("description", groupDescription)
         .order("created_at", { ascending: false })
         .limit(1);
 
@@ -316,6 +333,7 @@ function CreateGroupForm() {
 
       // If everything is successful, clear the form
       setGroupName("");
+      setGroupDescription("");
       setShowForm(false);
     } catch (error) {
       console.error("Error during group creation and joining:", error);
@@ -338,6 +356,16 @@ function CreateGroupForm() {
               name="name"
               value={groupName}
               onChange={(e) => setGroupName(e.target.value)}
+            />
+          </label>
+          <br></br>
+          <label>
+            Enter description for group:
+            <input
+              type="text"
+              name="desc"
+              value={groupDescription}
+              onChange={(e) => setGroupDescription(e.target.value)}
             />
           </label>
           <button className={styles.createButton} type="submit">Create</button>
@@ -659,7 +687,7 @@ export default function Home() {
                   <div style={{ marginLeft: 60, marginRight: 60 }}>
                     <p className={styles.descriptionTitle}>Tailored Study Groups</p>
                     <p className={styles.descriptionText}>Discover groups that match your courses and interests.
-                      Whether it's calculus or classic literature, there's a squad waiting for you.
+                      Whether it is calculus or classic literature, there is a squad waiting for you.
                     </p>
                   </div>
                   <img src="https://i.imgur.com/fqsGrnG.png" className={styles.line} />
@@ -685,9 +713,11 @@ const Header = () => {
   return (
     <header className={styles.header}>
       <img src="https://i.imgur.com/8Dc5Svm.png" style={{ width: 25, float: "left" }}></img>
-      <div style={{ marginLeft: 20, float: "left" }}>STRIVE</div>
+      <div style={{ marginLeft: 20, float: "left", marginTop: 3 }}>STRIVE</div>
       {isSignedIn ? (
-        <UserButton afterSignOutUrl="/" />
+        <div style={{ float: "right" }}>
+          <UserButton afterSignOutUrl="/" />
+        </div>
       ) : (
         <div style={{ float: "right" }}>
           <SignInButton style={{ marginRight: 20 }} />

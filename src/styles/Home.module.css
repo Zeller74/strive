@@ -1,4 +1,4 @@
-.main {   
+.main {
   margin: 0;
   height: 100%;
   overflow-y: hidden
@@ -8,7 +8,7 @@
   padding: 1rem 2rem;
   height: 4rem;
   background-color: #0077b6;
-  color:#ffffff;
+  color: #ffffff;
   width: 100%;
   display: inline-block;
   align-items: center;
@@ -16,230 +16,236 @@
   transition: background-color 0.5s ease;
 }
 
-.header:hover{
+.header:hover {
   background-color: rgb(0, 31, 41);
   color: white;
 }
-  
-  .container {
-    padding: 1rem 2rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-  }
 
-  .studyGroupContainer {
-    display: flex; 
-    width: 100%; /* Ensure it spans the entire width of its parent */
-  }
-
-  .chatContainer {
-    display: flex;
-    flex-direction: column-reverse; /* This reverses the display order */
-    overflow-y: auto; /* Make it scrollable */
-    height: 600px; /* Adjust as per your needs */
-    width: 60%;
-    border-width: thin;
-    border-color:#000;
-    margin-left: 22%;
-    margin-top: 2%;
-    background-color: rgb(224, 224, 224);
-  }
-  
-  .chatInput {
-    width: 85%;  /* Adjust this percentage based on your preference */
-    display: block;  /* This ensures it takes the full width you set */
-    margin: 0 auto;  /* Centers the input if its width is less than its container's width */
-    padding: 10px; /* Optional: add some padding for better appearance */
-    border-radius: 4px; /* Optional: to give rounded corners */
-    margin-bottom: 0px;
+.container {
+  padding: 1rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
-  
+
+.studyGroupContainer {
+  display: flex;
+  width: 100%;
+}
+
+.chatContainer {
+  display: flex;
+  flex-direction: column-reverse;
+  overflow-y: auto;
+  height: 600px;
+  width: 60%;
+  border-width: thin;
+  border-color: #000;
+  margin-left: 22%;
+  margin-top: 2%;
+  background-color: rgb(224, 224, 224);
+}
+
+.chatInput {
+  width: 85%;
+  display: block;
+  margin: 0 auto;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 0px;
+}
+
 .chatInput:focus {
-  border-color: #0077b6; /* Change the border color when input is focused */
+  border-color: #0077b6;
 }
 
 .sendMessageForm {
-  display: flex;  /* This makes the form a flex container */
-  justify-content: space-between;  /* This spreads the child elements horizontally */
-  align-items: center;  /* This centers the child elements vertically */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 15px;
 }
 
 .sendButton {
   padding: 10px 20px;
-  background-color: #0077b6; /* Adjust color as needed */
+  background-color: #0077b6;
   color: #ffffff;
   border: none;
-  border-radius: 4px; /* rounded on the right side */
+  border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.2s;
 }
 
 .sendButton:hover {
-  background-color: #005486; /* Slightly darker color on hover */
-}
-  
-  .studyGroupSidebar {
-    flex: 0 0 200px; /* flex-grow | flex-shrink | flex-basis */
-    margin-right: 00px;
-    width: 200px;
-  }
-  
-  .studyGroupButton {
-    display: block; /* Make the entire box clickable */
-    padding: 10px; /* Add padding for comfort */
-    cursor: pointer; /* Indicate that it's clickable */
-    border: 2px solid #000; /* Add an outline */
-    margin-bottom: 5px; /* Space between each group button */
-    transition: background-color 0.3s; /* Smooth transition for hover effect */
-    text-align: left; /* Align text to the left */
-    width: 100%; /* Take full width */
-    box-sizing: border-box; /* Include padding and border in the width */
-    background-color: #fff; /* White background */
-    color: #000; /* Black text */
-  }
-  
-  .studyGroupButton:hover {
-    background-color: #b5b5b5; /* Add a hover effect */
-  }
-  
-  .leaveButton, .joinButton {
-    border: 2px solid #333; /* Change #333 to your desired color */
-    padding: 5px 10px;
-    margin-left: 10px;
-    cursor: pointer;
-    background-color: white;
-    transition: background-color 0.2s ease;
-  }
-  
-  .leaveButton:hover, .joinButton:hover {
-    background-color: #f5f5f5; /* Change this color for hover effect */
-  }
-  
-  .joinButton {
-    border-color: green; /* Or any other desired color for join button */
-  }
-  
-  .leaveButton {
-    border-color: red; /* Or any other desired color for leave button */
-  }
-  
-  .selectedStudyGroup {
-    background-color: #d1d1d1; /* Customize this as needed */
-    /* Other styling properties if you need, like change in font color, border, etc. */
-  }
-  
-  .createGroupInput{
-    margin: 0 auto;
-    padding: 10px;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    background-color: #d6d2c9;
-  }
-
-  .createButton{
-    display: block;
-    padding: 5px 5px;
-    background-color: #0077b6;
-    border-radius: 4px;
-    color: #ffffff;
-    height: 60px;
-    width: 100px;
-    border-width: thin
-  }
-
-
-  .line{
-    width: 10px;
-  }
-
-  .searchButton{
-    padding: 5px 5px;
-    background-color: #0077b6;
-    border-radius: 4px;
-    color: #ffffff;
-    height: auto;
-    width: auto;
-    border-width: thin
-  }
-
-  .accountIn{
-display: grid;
-place-content: center;
-border-radius: 9px;
-border-color: white;
-background: rgb(0, 31, 41);
-color: white;
-width: 160%;
-height: 40px;
-transition: background-color 0.5s ease;
-}
-.accountIn:hover{
-background: white;
-color: rgb(0, 31, 41);
-border-color: rgb(0, 31, 41);;
+  background-color: #005486;
 }
 
-.accountUp{
-display: grid;
-place-content: center;
-border-radius: 9px;
-border-color: white;
-background: rgb(0, 31, 41);
-color: white;
-width: 160%;
-height: 40px;
-transition: background-color 0.5s ease;
-}
-.accountUp:hover{
-background: white;
-color: rgb(0, 31, 41);
-border-color: rgb(0, 31, 41);;
-}
-.welcome{
-text-align: center;
-height: 250px;
-display: grid;
-grid-template-columns: auto;
-color: white;
-background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 1), rgba(0, 0, 0, 1), rgba(255, 255, 255, 0));
+.studyGroupSidebar {
+  flex: 0 0 200px;
+  margin-right: 00px;
+  width: 200px;
 }
 
-.welcome p{
-font-size: 35px;
+.studyGroupButton {
+  display: block;
+  padding: 10px;
+  cursor: pointer;
+  border: 2px solid #000;
+  margin-bottom: 5px;
+  transition: background-color 0.3s;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: #fff;
+  color: #000;
+}
+
+.studyGroupButton:hover {
+  background-color: #b5b5b5;
+}
+
+.leaveButton,
+.joinButton {
+  border: 2px solid #333;
+  padding: 5px 10px;
+  margin-left: 10px;
+  cursor: pointer;
+  background-color: white;
+  transition: background-color 0.2s ease;
+}
+
+.leaveButton:hover,
+.joinButton:hover {
+  background-color: #f5f5f5;
+}
+
+.joinButton {
+  border-color: green;
+}
+
+.leaveButton {
+  border-color: red;
+}
+
+.selectedStudyGroup {
+  background-color: #d1d1d1;
+}
+
+.createGroupInput {
+  margin: 0 auto;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  background-color: #d6d2c9;
+}
+
+.createButton {
+  display: block;
+  padding: 5px 5px;
+  background-color: #0077b6;
+  border-radius: 4px;
+  color: #ffffff;
+  height: 60px;
+  width: 100px;
+  border-width: thin
+}
+
+
+.line {
+  width: 10px;
+}
+
+.searchButton {
+  padding: 5px 5px;
+  background-color: #0077b6;
+  border-radius: 4px;
+  color: #ffffff;
+  height: auto;
+  width: auto;
+  border-width: thin
+}
+
+.accountIn {
+  display: grid;
+  place-content: center;
+  border-radius: 9px;
+  border-color: white;
+  background: rgb(0, 31, 41);
+  color: white;
+  width: 160%;
+  height: 40px;
+  transition: background-color 0.5s ease;
+}
+
+.accountIn:hover {
+  background: white;
+  color: rgb(0, 31, 41);
+  border-color: rgb(0, 31, 41);
+  ;
+}
+
+.accountUp {
+  display: grid;
+  place-content: center;
+  border-radius: 9px;
+  border-color: white;
+  background: rgb(0, 31, 41);
+  color: white;
+  width: 160%;
+  height: 40px;
+  transition: background-color 0.5s ease;
+}
+
+.accountUp:hover {
+  background: white;
+  color: rgb(0, 31, 41);
+  border-color: rgb(0, 31, 41);
+  ;
+}
+
+.welcome {
+  text-align: center;
+  height: 250px;
+  display: grid;
+  grid-template-columns: auto;
+  color: white;
+  background: linear-gradient(to right, rgba(0, 0, 0, 1), rgba(0, 0, 0, 1), rgba(0, 0, 0, 1), rgba(255, 255, 255, 0));
+}
+
+.welcome p {
+  font-size: 35px;
 }
 
 .banner {
-display: flex;
-margin-bottom: -40px;
+  display: flex;
+  margin-bottom: -40px;
 }
 
-.image{
-flex:1;
+.image {
+  flex: 1;
 }
 
-.welcomeSignUp{
-flex:1;
-background: rgb(0, 0, 0);
-color: white;
-transition: background-color 0.5s ease;
-text-align: center;
-font-size: 25px;
+.welcomeSignUp {
+  flex: 1;
+  background: rgb(0, 0, 0);
+  color: white;
+  transition: background-color 0.5s ease;
+  text-align: center;
+  font-size: 25px;
 }
 
-.signUp{
+.signUp {
   background: rgb(79, 79, 79);
   border-radius: 9%;
-  width:205px;
-  height:80px;
+  width: 205px;
+  height: 80px;
   text-align: center;
   font-size: 30px;
   transition: background-color 0.5s ease;
 }
 
-.signUpDiv{
+.signUpDiv {
   margin: 0;
   position: absolute;
   margin-top: 60px;
@@ -248,38 +254,38 @@ font-size: 25px;
   transform: translate(-50%);
 }
 
-.signUp:hover{
+.signUp:hover {
   color: rgb(0, 0, 0);
   background-color: rgb(231, 249, 255);
-  }
+}
 
-.mainText{
+.mainText {
   font-weight: bold;
   text-align: center;
   font-size: 35px;
   margin-top: 30px;
 }
 
-.descriptions{
-margin: auto;
-height: 400px;
-display: flex;
-justify-content: center;
-align-items: center;
+.descriptions {
+  margin: auto;
+  height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.descriptionText:hover{
+.descriptionText:hover {
   border-radius: 9%;
   color: #0077b6;
 }
 
-.descriptionText{
+.descriptionText {
   width: 300px;
-  text-align:left;
+  text-align: left;
   transition: color 0.5s ease;
 }
 
-.descriptionTitle{
+.descriptionTitle {
   font-weight: bold;
   font-size: 20px;
   text-align: left;
@@ -288,7 +294,7 @@ align-items: center;
 
 .label {
   padding: 1rem 2rem;
-  color:black;
+  color: black;
 }
 
 .container {
@@ -301,4 +307,38 @@ align-items: center;
   padding-left: 1rem;
   align-self: baseline;
 }
-  
+
+.infoButton {
+  position: relative;
+  padding-left: 3px;
+}
+
+.tooltip {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: white;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+}
+
+.tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: black transparent transparent transparent;
+}
+
+.infoButton:hover .tooltip {
+  visibility: visible;
+}
