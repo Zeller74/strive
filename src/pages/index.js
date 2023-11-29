@@ -11,6 +11,7 @@ import {
 } from "@clerk/nextjs";
 
 import { createClient } from "@supabase/supabase-js";
+import { IoLogoGithub, IoMdInformationCircleOutline } from "react-icons/io";
 
 //import react pro sidebar components
 import {
@@ -106,7 +107,7 @@ const SearchGroups = ({ isVisible, onClose }) => {
         {filteredGroups.map((group) => (
           <div key={group.id} className={styles.groupItem}>
             {group.name}
-            <button className={styles.infoButton}>Info
+            <button className={styles.infoButton}><IoMdInformationCircleOutline/>
               <span className={styles.tooltip}>{group.description}</span>
             </button>
             {!isUserMember(group.id) && (
@@ -703,6 +704,30 @@ export default function Home() {
           </div>
         </main>
       )}
+      <div className={styles.footer}>
+        <div style={{flex: 1, textAlign:"center"}}>
+          <p style={{fontWeight: "bold", fontSize:20}}>About Us</p>
+          <p style={{fontSize:13}}>
+          STRIVE (Synchronous Team Review and Visualization Environment) was created by Jeffrey Yang, Paul Adelae, Hannah 
+          Nguyen, Rebecca Nguyen, and Joel Yates as a semester-long project for Software Engineering I at the 
+          University of Maryland, Baltimore County. Our goal was to make a web application that could act as
+          a convenient, user-friendly way to facilitate collaboration and team-learning amongst students.
+          </p>
+        </div>
+        <div style={{flex: 1, textAlign:"center"}}>
+          <p style={{fontWeight: "bold", fontSize:20}}>Contact Us</p>
+          <a href="https://github.com/Zeller74/strive" target="_blank"><button className={styles.githubButton}>
+            <IoLogoGithub style={{width:55, height:55}}></IoLogoGithub>
+          </button></a>
+          <p style={{fontSize:13}}>
+              jyang13@umbc.edu |
+              padelae1@umbc.edu |
+              hannahn2@umbc.edu |
+              xv46495@umbc.edu | 
+              jyates1@umbc.edu 
+          </p>
+        </div>
+      </div>
     </>
   );
 }
@@ -720,7 +745,7 @@ const Header = () => {
         </div>
       ) : (
         <div style={{ float: "right" }}>
-          <SignInButton style={{ marginRight: 20 }} />
+          <SignInButton style={{ marginRight: 25 }} />
           &nbsp;
           <SignUpButton />
         </div>
