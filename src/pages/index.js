@@ -87,15 +87,17 @@ const SearchGroups = ({ isVisible, onClose }) => {
 
   const filteredGroups = searchTerm
     ? groups.filter((group) =>
-      group.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
+        group.name.toLowerCase().includes(searchTerm.toLowerCase())
+      )
     : groups;
 
   if (!isVisible) return null;
 
   return (
     <div className="search-container">
-      <button className={styles.searchButton} onClick={onClose}>Close</button>
+      <button className={styles.searchButton} onClick={onClose}>
+        Close
+      </button>
       <input
         type="text"
         placeholder="Search groups..."
@@ -106,16 +108,21 @@ const SearchGroups = ({ isVisible, onClose }) => {
         {filteredGroups.map((group) => (
           <div key={group.id} className={styles.groupItem}>
             {group.name}
-            <button className={styles.infoButton}>Info
+            <button className={styles.infoButton}>
+              Info
               <span className={styles.tooltip}>{group.description}</span>
             </button>
             {!isUserMember(group.id) && (
-              <button className={styles.searchButton} onClick={() => joinGroup(group.id)}>Join</button>
+              <button
+                className={styles.searchButton}
+                onClick={() => joinGroup(group.id)}
+              >
+                Join
+              </button>
             )}
           </div>
         ))}
       </div>
-
     </div>
   );
 };
@@ -346,7 +353,9 @@ function CreateGroupForm() {
 
   return (
     <div>
-      <button className={styles.createButton} onClick={show}>Create Group</button>
+      <button className={styles.createButton} onClick={show}>
+        Create Group
+      </button>
       {showForm && (
         <form className={styles.createGroupInput} onSubmit={handleSubmit}>
           <label>
@@ -368,7 +377,9 @@ function CreateGroupForm() {
               onChange={(e) => setGroupDescription(e.target.value)}
             />
           </label>
-          <button className={styles.createButton} type="submit">Create</button>
+          <button className={styles.createButton} type="submit">
+            Create
+          </button>
         </form>
       )}
     </div>
@@ -389,16 +400,14 @@ function CreateEventForm({ currentStudyGroup }) {
       const supabaseAccessToken = await getToken({ template: "supabase" });
       const supabase = await supabaseClient(supabaseAccessToken);
 
-      let { error } = await supabase
-        .from("events")
-        .insert([
-          {
-            name: eventName,
-            description: eventDescription,
-            date: eventDate,
-            study_group: currentStudyGroup
-          }
-        ]);
+      let { error } = await supabase.from("events").insert([
+        {
+          name: eventName,
+          description: eventDescription,
+          date: eventDate,
+          study_group: currentStudyGroup,
+        },
+      ]);
 
       if (error) throw error;
 
@@ -418,7 +427,9 @@ function CreateEventForm({ currentStudyGroup }) {
 
   return (
     <div>
-      <button className={styles.createButton} onClick={show}>Create Event</button>
+      <button className={styles.createButton} onClick={show}>
+        Create Event
+      </button>
       {showForm && (
         <form className={styles.createEventInput} onSubmit={handleSubmit}>
           <label>
@@ -451,13 +462,14 @@ function CreateEventForm({ currentStudyGroup }) {
             />
           </label>
           <br />
-          <button className={styles.createButton} type="submit">Create</button>
+          <button className={styles.createButton} type="submit">
+            Create
+          </button>
         </form>
       )}
     </div>
   );
 }
-
 
 function SendMessageForm({
   messages,
@@ -486,26 +498,88 @@ function SendMessageForm({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (newMessage === "") {
+
+    if (!newMessage && !file) {
+      console.log("No message or file to send");
       return;
     }
 
-    const supabaseAccessToken = await getToken({ template: "supabase" });
-    const supabase = await supabaseClient(supabaseAccessToken);
+    try {
+      const supabaseAccessToken = await getToken({ template: "supabase" });
+      const supabase = await supabaseClient(supabaseAccessToken);
+      let fileURL = "";
 
-    const { data } = await supabase
-      .from("message")
-      .insert({
-        text: newMessage,
+      // Check if a file is selected for upload
+      if (file) {
+        const fileName = `${selectedStudyGroup}/${Date.now()}-${file.name}`;
+        const filePath = `${fileName}`;
+
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from("studygroupfiles")
+          .upload(filePath, file);
+
+        if (uploadError) {
+          console.error("Error uploading file:", uploadError);
+          return;
+        }
+
+        // Get the public URL for the new file
+        const response = await supabase.storage
+          .from("studygroupfiles")
+          .getPublicUrl(filePath);
+
+        if (response.error) {
+          console.error("Error getting file URL:", response.error);
+          return;
+        }
+
+        fileURL = response.data.publicUrl;
+
+        const { error: dbError } = await supabase.from("resource").insert({
+          path: fileURL,
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          study_group: selectedStudyGroup,
+          user_id: userId,
+        });
+
+        if (dbError) {
+          console.error("Error saving file info to database:", dbError);
+        }
+      }
+
+      // Construct the message content
+      let messageContent = newMessage;
+      if (fileURL) {
+        const fileType = file.type.split("/")[0];
+        const fileMessage =
+          fileType === "image"
+            ? `<img src="${fileURL}" alt="${file.name}"/>`
+            : `<a href="${fileURL}?download=" target="_blank" download style = "color: blue;">${file.name}</a>`;
+
+        messageContent += messageContent ? " " + fileMessage : fileMessage;
+      }
+
+      // Send the message
+      const { error: messageError } = await supabase.from("message").insert({
+        text: messageContent,
         user_id: userId,
-        study_group: selectedStudyGroup ?? 0,
-      })
-      .single();
+        study_group: selectedStudyGroup,
+        // Additional fields if needed
+      });
 
-    setMessages([...messages, data]);
-    setNewMessage("");
+      if (messageError) {
+        console.error("Error sending message:", messageError);
+        return;
+      }
 
-    refreshMessages();
+      refreshMessages();
+      setNewMessage("");
+      setFile(null); // Clear file input
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   const [file, setFile] = useState(null);
@@ -513,7 +587,7 @@ function SendMessageForm({
   const handleFileChange = (e) => {
     setFile(e.target.files[0]);
   };
-
+  /*
   const handleUpload = async () => {
     if (!file) return;
 
@@ -587,11 +661,11 @@ function SendMessageForm({
 
     setFile(null);
   };
+  */
 
   return (
     <form className={styles.sendMessageForm} onSubmit={handleSubmit}>
       <input type="file" onChange={handleFileChange} />
-      <button type="button" onClick={handleUpload}>Upload File</button>
       <input
         className={styles.chatInput}
         onChange={(e) => setNewMessage(e.target.value)}
@@ -724,7 +798,6 @@ export default function Home() {
                     />
                   </div>
 
-
                   {/* Search Section */}
                   <div style={{ display: isSearchVisible ? "block" : "none" }}>
                     <SearchGroups
@@ -734,7 +807,12 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <button className={styles.createButton} onClick={toggleSearch}>Find Group</button>
+                    <button
+                      className={styles.createButton}
+                      onClick={toggleSearch}
+                    >
+                      Find Group
+                    </button>
                     <CreateGroupForm />
                     <CreateEventForm currentStudyGroup={selectedStudyGroup} />
                   </div>
@@ -745,41 +823,62 @@ export default function Home() {
                 <div className={styles.banner}>
                   <div className={styles.welcomeSignUp}>
                     <div>
-                      <p className={styles.mainText}>
-                        Succeed Together.
-                      </p>
-                      <p style={{ textAlign: "center", marginLeft: 50, marginRight: 50 }}>
-                        Join virtual study groups tailored to your subjects and STRIVE for greatness
+                      <p className={styles.mainText}>Succeed Together.</p>
+                      <p
+                        style={{
+                          textAlign: "center",
+                          marginLeft: 50,
+                          marginRight: 50,
+                        }}
+                      >
+                        Join virtual study groups tailored to your subjects and
+                        STRIVE for greatness
                       </p>
                       <div className={styles.signUpDiv}>
                         <SignUpButton className={styles.signUp} />
                       </div>
                     </div>
                   </div>
-                  <img className={styles.image}
+                  <img
+                    className={styles.image}
                     src="https://i.imgur.com/jOH1c0q.png"
                   />
                 </div>
                 <div className={styles.descriptions}>
                   <div style={{ marginLeft: 60, marginRight: 60 }}>
-                    <p className={styles.descriptionTitle}>Collaborative Learning Hub</p>
+                    <p className={styles.descriptionTitle}>
+                      Collaborative Learning Hub
+                    </p>
                     <p className={styles.descriptionText}>
-                      Dive into seamless collaboration with video sessions, whiteboards, and chat.
-                      Turn study hours into interactive brainstorming sessions
+                      Dive into seamless collaboration with video sessions,
+                      whiteboards, and chat. Turn study hours into interactive
+                      brainstorming sessions
                     </p>
                   </div>
-                  <img src="https://i.imgur.com/fqsGrnG.png" className={styles.line} />
+                  <img
+                    src="https://i.imgur.com/fqsGrnG.png"
+                    className={styles.line}
+                  />
                   <div style={{ marginLeft: 60, marginRight: 60 }}>
-                    <p className={styles.descriptionTitle}>Tailored Study Groups</p>
-                    <p className={styles.descriptionText}>Discover groups that match your courses and interests.
-                      Whether it is calculus or classic literature, there is a squad waiting for you.
+                    <p className={styles.descriptionTitle}>
+                      Tailored Study Groups
+                    </p>
+                    <p className={styles.descriptionText}>
+                      Discover groups that match your courses and interests.
+                      Whether it is calculus or classic literature, there is a
+                      squad waiting for you.
                     </p>
                   </div>
-                  <img src="https://i.imgur.com/fqsGrnG.png" className={styles.line} />
+                  <img
+                    src="https://i.imgur.com/fqsGrnG.png"
+                    className={styles.line}
+                  />
                   <div style={{ marginLeft: 60, marginRight: 60 }}>
                     <p className={styles.descriptionTitle}>Resource Central</p>
-                    <p className={styles.descriptionText}>Access a treasure trove of shared notes, practice papers
-                      and study materials. Every group member contributes, and everyone benefits!
+                    <p className={styles.descriptionText}>
+                      Access a treasure trove of shared notes, practice papers
+                      and study materials. Every group member contributes, and
+                      everyone benefits!
                     </p>
                   </div>
                 </div>
@@ -797,7 +896,10 @@ const Header = () => {
 
   return (
     <header className={styles.header}>
-      <img src="https://i.imgur.com/8Dc5Svm.png" style={{ width: 25, float: "left" }}></img>
+      <img
+        src="https://i.imgur.com/8Dc5Svm.png"
+        style={{ width: 25, float: "left" }}
+      ></img>
       <div style={{ marginLeft: 20, float: "left", marginTop: 3 }}>STRIVE</div>
       {isSignedIn ? (
         <div style={{ float: "right" }}>
