@@ -27,7 +27,7 @@ import { Button, Box, List, ListItemButton, Tooltip } from "@mui/material";
 import { FaRegHeart } from "react-icons/fa";
 import { FiArrowLeftCircle, FiArrowRightCircle } from "react-icons/fi";
 
-//import sidebar css from react-pro-sidebar module and our custom css
+//import sidebar css from react-pro-sidebar module and custom css
 import "react-pro-sidebar/dist/css/styles.css";
 
 const supabaseClient = async (supabaseAccessToken) => {
@@ -163,7 +163,8 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
   const { getToken, userId } = useAuth();
   const [groups, setGroups] = useState([]);
   const [userGroups, setUserGroups] = useState([]);
-  const [isInitialGroupSet, setIsInitialGroupSet] = useState(false); // New state variable
+  const [events, setEvents] = useState([]);
+  const [isInitialGroupSet, setIsInitialGroupSet] = useState(false);
 
   useEffect(() => {
     const fetchGroups = async () => {
@@ -186,7 +187,19 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
 
       if (!isInitialGroupSet && userEnrollments.length > 0) {
         setSelectedStudyGroup(userEnrollments[0].study_group);
-        setIsInitialGroupSet(true); // Set the flag to true after setting the initial group
+        setIsInitialGroupSet(true);
+      }
+
+      if (selectedStudyGroup) {
+        const { data: groupEvents } = await supabase
+          .from("events")
+          .select("*")
+          .eq("study_group", selectedStudyGroup)
+          .gte("date", new Date().toISOString()); // Assuming 'date' is the event date column
+
+        setEvents(groupEvents);
+      } else {
+        setEvents([]);
       }
     };
 
@@ -222,6 +235,22 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
     //condition checking to change state from true to false and vice versa
     menuCollapse ? setMenuCollapse(false) : setMenuCollapse(true);
   };
+
+  const renderTooltipContent = () => (
+    <div className="events-tooltip">
+      {events.length > 0 ? (
+        events.map(event => (
+          <div key={event.id} className="event">
+            <strong>{event.name}</strong><br />
+            <span>{event.date}</span><br />
+            <span>{event.description}</span>
+          </div>
+        ))
+      ) : (
+        <div>No upcoming events</div>
+      )}
+    </div>
+  );
 
   return (
     <div id="header">
@@ -269,6 +298,14 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
                       >
                         <p>{menuCollapse ? "" : "Leave"}</p>
                       </Button>
+                      {selectedStudyGroup === group.id && (
+                        <div className={styles.eventContainer}>
+                          <span className={styles.eventTrigger}>Events</span>
+                          <div className={styles.eventText}>
+                            {renderTooltipContent()}
+                          </div>
+                        </div>
+                      )}
                     </MenuItem>
                   </div>
                 </li>
