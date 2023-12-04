@@ -36,9 +36,10 @@ const GroupContext = createContext();
 const useGroup = () => useContext(GroupContext);
 
 const GroupProvider = ({ children }) => {
-  const { getToken, userId } = useAuth(); // Assuming you have these hooks available
+  const { getToken, userId } = useAuth();
   const [groups, setGroups] = useState([]);
   const [userGroups, setUserGroups] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const refreshGroups = async () => {
     try {
@@ -67,16 +68,40 @@ const GroupProvider = ({ children }) => {
       console.error("Error refreshing groups:", error);
     }
   };
+
+  const refreshUserGroups = async () => {
+    try {
+      const supabaseAccessToken = await getToken({ template: "supabase" });
+      const supabase = await supabaseClient(supabaseAccessToken);
+
+      const { data: userGroupsData, error: userGroupsError } = await supabase
+        .from("enrollment")
+        .select("study_group")
+        .eq("user_id", userId);
+      if (userGroupsError) throw userGroupsError;
+
+      setUserGroups(userGroupsData.map((enrollment) => enrollment.study_group));
+    } catch (error) {
+      console.error("Error refreshing user groups:", error);
+    }
+  };
+
   useEffect(() => {
-    // Fetch initial data when the component mounts
-    refreshGroups();
-  }, []);
+    const fetchData = async () => {
+      await refreshGroups();
+      await refreshUserGroups();
+      setLoading(false);
+    };
+    fetchData();
+  }, [userId]);
+
   return (
-    <GroupContext.Provider value={{ groups, userGroups, refreshGroups }}>
+    <GroupContext.Provider value={{ groups, userGroups, loading, refreshGroups, refreshUserGroups }}>
       {children}
     </GroupContext.Provider>
   );
 };
+
 
 
 const supabaseClient = async (supabaseAccessToken) => {
