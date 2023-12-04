@@ -1,5 +1,7 @@
 import styles from "../styles/Home.module.css";
 import React, { useContext, createContext, useState, useEffect, useRef } from "react";
+import { FaCalendarAlt } from 'react-icons/fa';
+
 
 import {
   useAuth,
@@ -214,6 +216,11 @@ const SearchGroups = ({ isVisible, onClose }) => {
                     className={styles.infoButton}
                     selected={selectedGroupID == group.id}
                     onClick={(event) => handleListItemClick(event, group.id)}
+                    sx={{
+                      "&.Mui-selected": {
+                        backgroundColor: "#56c5fc"
+                      }
+                    }}
                   >
                     {group.name}
                   </ListItemButton>
@@ -255,26 +262,28 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
   const [events, setEvents] = useState([]);
   const [isInitialGroupSet, setIsInitialGroupSet] = useState(false);
 
-  useEffect(() => {
-
-    const fetchGroups = async () => {
+  const fetchEvents = async () => {
+    if (selectedStudyGroup != null && selectedStudyGroup !== undefined) {
       const supabaseAccessToken = await getToken({ template: "supabase" });
       const supabase = await supabaseClient(supabaseAccessToken);
+      const { data: groupEvents, error } = await supabase
+        .from("events")
+        .select("*")
+        .eq("study_group", selectedStudyGroup)
+        .gte("date", new Date().toISOString());
 
-      if (selectedStudyGroup != null && selectedStudyGroup != undefined) {
-        const { data: groupEvents, error } = await supabase
-          .from("events")
-          .select("*")
-          .eq("study_group", selectedStudyGroup)
-          .gte("date", new Date().toISOString());
-
+      if (!error) {
         setEvents(groupEvents);
       } else {
-        setEvents([]);
+        console.error("Error fetching events:", error);
       }
-    };
+    }
+  };
 
-    fetchGroups();
+  useEffect(() => {
+
+
+    fetchEvents();
     console.log("Groups from context:", groups);
     console.log("User Groups from context:", userGroups);
 
@@ -396,10 +405,15 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
                       {selectedStudyGroup === group.id && (
                         <Tooltip
                           title={renderTooltipContent()}
-                          placement="right-start"
+                          placement="right"
                           disableInteractive
                         >
-                          <span className={styles.eventTrigger}>Events</span>
+                          <div onMouseEnter={fetchEvents}>
+                            <FaCalendarAlt className={styles.calendarIcon} />
+                            <span className={styles.eventTrigger}></span>
+                          </div>
+                          {/*<FaCalendarAlt className={styles.calendarIcon} />*/}
+
                         </Tooltip>
                       )}
                     </MenuItem>

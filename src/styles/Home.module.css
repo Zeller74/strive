@@ -327,7 +327,7 @@
 }
 
 .tooltip::after {
-  overflow: visible;        
+  overflow: visible;
   position: absolute;
   content: "";
   position: absolute;
@@ -372,6 +372,7 @@
   visibility: visible;
   opacity: 1;
 }
+
 .event {
   margin-bottom: 10px;
 }
@@ -394,16 +395,27 @@
 .eventDescription {
   font-size: 0.9em;
 }
-.eventTrigger{
+
+.eventTrigger {
+  float: right;
+}
+
+.calendarIcon {
+  font-size: 20px;
+  /* Adjust the size as needed */
+  color: #666;
+  /* Adjust the color as needed */
+  cursor: pointer;
+  /* Any other styling you want */
   float: right;
 }
 
 .footer {
   bottom: 0px;
-	margin: 0px;
-	left:0px;
-	right:0px;
-	padding: 30px;
+  margin: 0px;
+  left: 0px;
+  right: 0px;
+  padding: 30px;
   width: 100%;
   display: inline-flex;
   background-color: #0077b6;
@@ -411,5 +423,5 @@
 }
 
 .githubButton {
-  border:none;
+  border: none;
 }
