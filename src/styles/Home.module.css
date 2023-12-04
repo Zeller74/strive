@@ -350,3 +350,19 @@
 .infoButton:hover .tooltip {
   visibility: visible;
 }
+
+.footer {
+  bottom: 0px;
+	margin: 0px;
+	left:0px;
+	right:0px;
+	padding: 30px;
+  width: 100%;
+  display: inline-flex;
+  background-color: #0077b6;
+  color: white;
+}
+
+.githubButton {
+  border:none;
+}
