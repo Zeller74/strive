@@ -11,6 +11,7 @@ import {
 } from "@clerk/nextjs";
 
 import { createClient } from "@supabase/supabase-js";
+import { IconContext } from "react-icons";
 import { IoLogoGithub, IoMdInformationCircleOutline } from "react-icons/io";
 
 //import react pro sidebar components
@@ -24,8 +25,8 @@ import {
 import { Button, Box, List, ListItemButton, Tooltip } from "@mui/material";
 
 //import icons from react icons
-import { FaRegHeart } from "react-icons/fa";
-import { FiArrowLeftCircle, FiArrowRightCircle } from "react-icons/fi";
+import { IoMdExit } from "react-icons/io";
+import { RxCross1 } from "react-icons/rx";
 
 //import sidebar css from react-pro-sidebar module and custom css
 import "react-pro-sidebar/dist/css/styles.css";
@@ -275,7 +276,6 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
                 <li key={group.id}>
                   <div>
                     <MenuItem
-                      icon={<FaRegHeart />}
                       className={
                         selectedStudyGroup === group.id
                           ? styles.selectedStudyGroup
@@ -283,21 +283,25 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
                       }
                       onClick={() => handleClick(group.id)}
                     >
-                      {group.name}
-                      <Button
-                        sx={{ m: 1 }}
-                        onClick={() => leaveGroup(group.id)}
-                        variant="contained"
-                        size="small"
-                        style={{
-                          maxWidth: "50px",
-                          maxHeight: "25px",
-                          minWidth: "50px",
-                          minHeight: "25px",
-                        }}
-                      >
-                        <p>{menuCollapse ? "" : "Leave"}</p>
-                      </Button>
+                      <Tooltip title={<h1 style={{ fontSize: 12 }}>Leave Group</h1>} placement="top-start" disableInteractive>
+                        <Button
+                          sx={{ m: 1 }}
+                          onClick={() => leaveGroup(group.id)}
+                          variant="contained"
+                          size="small"
+                          style={{
+                            maxWidth: "30px",
+                            maxHeight: "30px",
+                            minWidth: "30px",
+                            minHeight: "30px",
+                          }}
+                        >
+                          <IconContext.Provider value={{ size: '15px' }}>
+                            <div>
+                              <RxCross1 style={{size:"10"}} ></RxCross1>
+                            </div>
+                          </IconContext.Provider>
+                        </Button>
                       {selectedStudyGroup === group.id && (
                         <div className={styles.eventContainer}>
                           <span className={styles.eventTrigger}>Events</span>
@@ -306,6 +310,8 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
                           </div>
                         </div>
                       )}
+                        {group.name}
+                      </Tooltip>
                     </MenuItem>
                   </div>
                 </li>
@@ -425,7 +431,7 @@ function CreateGroupForm() {
               onChange={(e) => setGroupDescription(e.target.value)}
             />
           </label>
-          <button className={styles.createButton} type="submit">
+          <button className={styles.createButton2} type="submit">
             Create
           </button>
         </form>
@@ -475,7 +481,7 @@ function CreateEventForm({ currentStudyGroup }) {
 
   return (
     <div>
-      <button className={styles.createButton} onClick={show}>
+      <button className={styles.createButton1} onClick={show}>
         Create Event
       </button>
       {showForm && (
@@ -501,7 +507,7 @@ function CreateEventForm({ currentStudyGroup }) {
           </label>
           <br />
           <label>
-            Enter date for event:
+            Enter date for event:<br></br>
             <input
               type="date"
               name="date"
@@ -510,7 +516,7 @@ function CreateEventForm({ currentStudyGroup }) {
             />
           </label>
           <br />
-          <button className={styles.createButton1} type="submit">
+          <button className={styles.createButton2} type="submit">
             Create
           </button>
         </form>
@@ -797,7 +803,7 @@ export default function Home() {
                   </div>
                   <div>
                     <button
-                      className={styles.searchButton}
+                      className={styles.createButton1}
                       onClick={toggleSearch}
                     >
                       Find Group
