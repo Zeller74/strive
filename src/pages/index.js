@@ -21,7 +21,7 @@ import {
   SidebarHeader,
   SidebarContent,
 } from "react-pro-sidebar";
-import { Button, Box } from "@mui/material";
+import { Button, Box, List, ListItemButton, Tooltip } from "@mui/material";
 
 //import icons from react icons
 import { FaRegHeart } from "react-icons/fa";
@@ -47,6 +47,7 @@ const SearchGroups = ({ isVisible, onClose }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [groups, setGroups] = useState([]);
   const [userGroups, setUserGroups] = useState([]); // To store the user's groups
+  const [selectedGroupID, setSelectedGroupID] = useState(""); // see what is selected
 
   useEffect(() => {
     const fetchGroupsAndUserGroups = async () => {
@@ -72,18 +73,22 @@ const SearchGroups = ({ isVisible, onClose }) => {
     fetchGroupsAndUserGroups();
   }, [isVisible, getToken, userId]);
 
-  const joinGroup = async (groupId) => {
+  const joinGroup = async (groupID) => {
     const supabaseAccessToken = await getToken({ template: "supabase" });
     const supabase = await supabaseClient(supabaseAccessToken);
-    await supabase
-      .from("enrollment")
-      .insert({ user_id: userId, study_group: groupId });
 
-    setUserGroups([...userGroups, groupId]);
+    if (userGroups.includes(groupID)){ }
+    else {
+      await supabase
+        .from("enrollment")
+        .insert({ user_id: userId, study_group: groupID });
+
+      setUserGroups([...userGroups, groupID]);
+    }
   };
 
-  const isUserMember = (groupId) => {
-    return userGroups.includes(groupId);
+  const isUserMember = (groupID) => {
+    return userGroups.includes(groupID);
   };
 
   const filteredGroups = searchTerm
@@ -94,35 +99,40 @@ const SearchGroups = ({ isVisible, onClose }) => {
 
   if (!isVisible) return null;
 
+  const handleListItemClick = (event, groupID) => {
+    setSelectedGroupID(groupID);
+  };
+
   return (
     <div className="search-container">
-      <button className={styles.searchButton} onClick={onClose}>
-        Close
-      </button>
       <input
+        style={{marginLeft:10, maxWidth:"8.5rem"}} 
         type="text"
         placeholder="Search groups..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <div className="group-list">
-        {filteredGroups.map((group) => (
-          <div key={group.id} className={styles.groupItem}>
-            {group.name}
-            <button className={styles.infoButton}><IoMdInformationCircleOutline/>
-              <span className={styles.tooltip}>{group.description}</span>
-            </button>
-            {!isUserMember(group.id) && (
-              <button
-                className={styles.searchButton}
-                onClick={() => joinGroup(group.id)}
+    <br></br>
+    <button style={{marginLeft:10}} className={styles.searchButton} onClick={() => joinGroup(selectedGroupID)}>Join Group</button>
+    <Box sx={{ maxHeight: "31rem", overflowY: 'auto', width: '100%', maxWidth: 360 }}>
+      <List component="nav" aria-label="main mailbox folders">
+      {filteredGroups.map((group) => (
+        <div key={group.id} className={styles.groupItem}>
+          {!(isUserMember(group.id)) && (
+            <Tooltip title={<h1 style={{ fontSize: 14 }}>{group.description}</h1>} placement="top" arrow disableInteractive>
+              <ListItemButton 
+              className={styles.infoButton}
+              selected={selectedGroupID == group.id}
+              onClick={(event) => handleListItemClick(event, group.id)}
               >
-                Join
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
+                {group.name} 
+              </ListItemButton>
+            </Tooltip>
+          )}
+        </div>
+      ))}
+      </List>
+    </Box>
     </div>
   );
 };
@@ -218,11 +228,14 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
       <ProSidebar collapsed={menuCollapse}>
         <SidebarHeader>
           <div className="logotext">
+            <p>Groups</p>
+          </div>
+          {/* <div className="logotext">
             <p>{menuCollapse ? "" : "Groups"}</p>
           </div>
           <div className="closemenu" onClick={menuIconClick}>
             {menuCollapse ? <FiArrowRightCircle /> : <FiArrowLeftCircle />}
-          </div>
+          </div> */}
         </SidebarHeader>
         <SidebarContent>
           <Menu iconShape="square">
@@ -353,13 +366,11 @@ function CreateGroupForm() {
 
   return (
     <div>
-      <button className={styles.createButton} onClick={show}>
-        Create Group
-      </button>
+      <button className={styles.createButton1} onClick={show}>Create Group</button>
       {showForm && (
         <form className={styles.createGroupInput} onSubmit={handleSubmit}>
           <label>
-            Enter name of group:
+            Enter name of group:<br></br>
             <input
               type="text"
               name="name"
@@ -369,7 +380,7 @@ function CreateGroupForm() {
           </label>
           <br></br>
           <label>
-            Enter description for group:
+            Enter description for group:<br></br>
             <input
               type="text"
               name="desc"
@@ -740,7 +751,7 @@ export default function Home() {
                   </div>
 
                   {/* Search Section */}
-                  <div style={{ display: isSearchVisible ? "block" : "none" }}>
+                  <div style={{ width:"10rem", display: isSearchVisible ? "block" : "none" }}>
                     <SearchGroups
                       getToken={getToken}
                       isVisible={isSearchVisible}
@@ -775,9 +786,9 @@ export default function Home() {
                         Join virtual study groups tailored to your subjects and
                         STRIVE for greatness
                       </p>
-                      <div className={styles.signUpDiv}>
+                      <p className={styles.signUpDiv}>
                         <SignUpButton className={styles.signUp} />
-                      </div>
+                      </p>
                     </div>
                   </div>
                   <img
@@ -824,34 +835,39 @@ export default function Home() {
                   </div>
                 </div>
               </>
-            )}
+            
+            )
+            }
           </div>
         </main>
       )}
-      <div className={styles.footer}>
-        <div style={{flex: 1, textAlign:"center"}}>
-          <p style={{fontWeight: "bold", fontSize:20}}>About Us</p>
-          <p style={{fontSize:13}}>
-          STRIVE (Synchronous Team Review and Visualization Environment) was created by Jeffrey Yang, Paul Adelae, Hannah 
-          Nguyen, Rebecca Nguyen, and Joel Yates as a semester-long project for Software Engineering I at the 
-          University of Maryland, Baltimore County. Our goal was to make a web application that could act as
-          a convenient, user-friendly way to facilitate collaboration and team-learning amongst students.
-          </p>
+      {isSignedIn ? (<></>) : (
+        <>
+        <div className={styles.footer}>
+          <div style={{flex: 1, textAlign:"center"}}>
+            <p style={{fontWeight: "bold", fontSize:20}}>About Us</p>
+            <p style={{fontSize:13}}>
+            STRIVE (Synchronous Team Review and Visualization Environment) was created by Jeffrey Yang, Paul Adelae, Hannah 
+            Nguyen, Rebecca Nguyen, and Joel Yates as a semester-long project for Software Engineering I at the 
+            University of Maryland, Baltimore County. Our goal was to make a web application that could act as
+            a convenient, user-friendly way to facilitate collaboration and team-learning amongst students.
+            </p>
+          </div>
+          <div style={{flex: 1, textAlign:"center"}}>
+            <p style={{fontWeight: "bold", fontSize:20}}>Contact Us</p>
+            <a href="https://github.com/Zeller74/strive" target="_blank"><button className={styles.githubButton}>
+              <IoLogoGithub style={{width:55, height:55}}></IoLogoGithub>
+            </button></a>
+            <p style={{fontSize:13}}>
+                jyang13@umbc.edu |
+                padelae1@umbc.edu |
+                hannahn2@umbc.edu |
+                xv46495@umbc.edu | 
+                jyates1@umbc.edu 
+            </p>
+          </div>
         </div>
-        <div style={{flex: 1, textAlign:"center"}}>
-          <p style={{fontWeight: "bold", fontSize:20}}>Contact Us</p>
-          <a href="https://github.com/Zeller74/strive" target="_blank"><button className={styles.githubButton}>
-            <IoLogoGithub style={{width:55, height:55}}></IoLogoGithub>
-          </button></a>
-          <p style={{fontSize:13}}>
-              jyang13@umbc.edu |
-              padelae1@umbc.edu |
-              hannahn2@umbc.edu |
-              xv46495@umbc.edu | 
-              jyates1@umbc.edu 
-          </p>
-        </div>
-      </div>
+        </>)}
     </>
   );
 }
