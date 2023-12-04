@@ -1,5 +1,5 @@
 import styles from "../styles/Home.module.css";
-import { useState, useEffect, useRef } from "react";
+import React, { useContext, createContext, useState, useEffect, useRef } from "react";
 
 import {
   useAuth,
@@ -31,6 +31,54 @@ import { RxCross1 } from "react-icons/rx";
 //import sidebar css from react-pro-sidebar module and custom css
 import "react-pro-sidebar/dist/css/styles.css";
 
+const GroupContext = createContext();
+
+const useGroup = () => useContext(GroupContext);
+
+const GroupProvider = ({ children }) => {
+  const { getToken, userId } = useAuth(); // Assuming you have these hooks available
+  const [groups, setGroups] = useState([]);
+  const [userGroups, setUserGroups] = useState([]);
+
+  const refreshGroups = async () => {
+    try {
+      const supabaseAccessToken = await getToken({ template: "supabase" });
+      const supabase = await supabaseClient(supabaseAccessToken);
+
+      // Fetch all groups
+      const { data: allGroupsData, error: allGroupsError } = await supabase
+        .from("study_group")
+        .select("*");
+      if (allGroupsError) throw allGroupsError;
+
+      // Fetch the groups the user is a member of
+      const { data: userGroupsData, error: userGroupsError } = await supabase
+        .from("enrollment")
+        .select("study_group")
+        .eq("user_id", userId);
+      if (userGroupsError) throw userGroupsError;
+
+      setGroups(allGroupsData);
+      setUserGroups(userGroupsData.map((enrollment) => enrollment.study_group));
+      console.log("Groups:", allGroupsData);
+      console.log("User Groups:", userGroupsData);
+
+    } catch (error) {
+      console.error("Error refreshing groups:", error);
+    }
+  };
+  useEffect(() => {
+    // Fetch initial data when the component mounts
+    refreshGroups();
+  }, []);
+  return (
+    <GroupContext.Provider value={{ groups, userGroups, refreshGroups }}>
+      {children}
+    </GroupContext.Provider>
+  );
+};
+
+
 const supabaseClient = async (supabaseAccessToken) => {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -45,9 +93,8 @@ const supabaseClient = async (supabaseAccessToken) => {
 
 const SearchGroups = ({ isVisible, onClose }) => {
   const { getToken, userId } = useAuth();
+  const { refreshGroups, groups, userGroups } = useGroup();
   const [searchTerm, setSearchTerm] = useState("");
-  const [groups, setGroups] = useState([]);
-  const [userGroups, setUserGroups] = useState([]); // To store the user's groups
   const [selectedGroupID, setSelectedGroupID] = useState(""); // see what is selected
 
   useEffect(() => {
@@ -61,14 +108,13 @@ const SearchGroups = ({ isVisible, onClose }) => {
       const { data: allGroupsData } = await supabase
         .from("study_group")
         .select("*");
-      setGroups(allGroupsData);
 
       // Fetch the groups the user is a member of
       const { data: userGroupsData } = await supabase
         .from("enrollment")
         .select("study_group")
         .eq("user_id", userId);
-      setUserGroups(userGroupsData.map((enrollment) => enrollment.study_group));
+
     };
 
     fetchGroupsAndUserGroups();
@@ -84,7 +130,7 @@ const SearchGroups = ({ isVisible, onClose }) => {
         .from("enrollment")
         .insert({ user_id: userId, study_group: groupID });
 
-      setUserGroups([...userGroups, groupID]);
+      await refreshGroups();
     }
   };
 
@@ -94,8 +140,8 @@ const SearchGroups = ({ isVisible, onClose }) => {
 
   const filteredGroups = searchTerm
     ? groups.filter((group) =>
-        group.name.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+      group.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
     : groups;
 
   if (!isVisible) return null;
@@ -180,35 +226,15 @@ const ChatMessages = ({ messages, setMessages }) => {
 
 function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
   const { getToken, userId } = useAuth();
-  const [groups, setGroups] = useState([]);
-  const [userGroups, setUserGroups] = useState([]);
+  const { refreshGroups, groups, userGroups } = useGroup();
   const [events, setEvents] = useState([]);
   const [isInitialGroupSet, setIsInitialGroupSet] = useState(false);
 
   useEffect(() => {
-    
+
     const fetchGroups = async () => {
       const supabaseAccessToken = await getToken({ template: "supabase" });
       const supabase = await supabaseClient(supabaseAccessToken);
-
-      // Fetch all study groups
-      const { data: allGroupsData } = await supabase
-        .from("study_group")
-        .select("*");
-
-      // Fetch only the study groups where the user is enrolled
-      const { data: userEnrollments } = await supabase
-        .from("enrollment")
-        .select("study_group")
-        .eq("user_id", userId);
-
-      setGroups(allGroupsData); // This will set the list of ALL study groups
-      setUserGroups(userEnrollments.map((e) => e.study_group)); // This will set only the ones user is part of
-
-      if (!isInitialGroupSet && userEnrollments.length > 0) {
-        setSelectedStudyGroup(userEnrollments[0].study_group);
-        setIsInitialGroupSet(true);
-      }
 
       if (selectedStudyGroup != null && selectedStudyGroup != undefined) {
         const { data: groupEvents, error } = await supabase
@@ -224,6 +250,9 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
     };
 
     fetchGroups();
+    console.log("Groups from context:", groups);
+    console.log("User Groups from context:", userGroups);
+
   }, [userId, selectedStudyGroup, setSelectedStudyGroup, isInitialGroupSet]);
 
   const leaveGroup = async (groupId) => {
@@ -231,13 +260,20 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
 
     const supabaseAccessToken = await getToken({ template: "supabase" });
     const supabase = await supabaseClient(supabaseAccessToken);
-    await supabase
+
+    const { error } = await supabase
       .from("enrollment")
       .delete()
       .eq("user_id", userId)
       .eq("study_group", groupId);
-    setUserGroups(userGroups.filter((g) => g !== groupId));
+
+    if (!error) {
+      refreshGroups(); // Refresh groups after leaving
+    } else {
+      console.error("Error leaving group:", error);
+    }
   };
+
   const handleClick = (groupId) => {
     setSelectedStudyGroup(groupId);
   };
@@ -257,7 +293,7 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
         events.map((event) => {
           const eventDate = new Date(event.date);
           const formattedDate = eventDate.toLocaleDateString();
-  
+
           return (
             <div key={event.id} className="event">
               <div className={styles.eventHeader}>
@@ -273,8 +309,8 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
       )}
     </div>
   );
-  
-  
+
+
 
   return (
     <div id="header">
@@ -803,7 +839,7 @@ export default function Home() {
   }, [selectedStudyGroup]);
 
   return (
-    <>
+    <GroupProvider>
       <Header />
       {isLoading ? (
         <></>
@@ -962,7 +998,7 @@ export default function Home() {
           </div>
         </>
       )}
-    </>
+    </GroupProvider>
   );
 }
 
