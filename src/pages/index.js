@@ -186,6 +186,7 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
   const [isInitialGroupSet, setIsInitialGroupSet] = useState(false);
 
   useEffect(() => {
+    
     const fetchGroups = async () => {
       const supabaseAccessToken = await getToken({ template: "supabase" });
       const supabase = await supabaseClient(supabaseAccessToken);
@@ -209,12 +210,12 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
         setIsInitialGroupSet(true);
       }
 
-      if (selectedStudyGroup) {
-        const { data: groupEvents } = await supabase
+      if (selectedStudyGroup != null && selectedStudyGroup != undefined) {
+        const { data: groupEvents, error } = await supabase
           .from("events")
           .select("*")
           .eq("study_group", selectedStudyGroup)
-          .gte("date", new Date().toISOString()); // Assuming 'date' is the event date column
+          .gte("date", new Date().toISOString());
 
         setEvents(groupEvents);
       } else {
@@ -228,7 +229,7 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
     return () => {
       clearInterval(intervalId);
     };
-  }, [userId, setSelectedStudyGroup, isInitialGroupSet]);
+  }, [userId, selectedStudyGroup, setSelectedStudyGroup, isInitialGroupSet]);
 
   const leaveGroup = async (groupId) => {
     console.log("Attempting to leave group with ID:", groupId);
@@ -258,20 +259,27 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
   const renderTooltipContent = () => (
     <div className="events-tooltip">
       {events.length > 0 ? (
-        events.map((event) => (
-          <div key={event.id} className="event">
-            <strong>{event.name}</strong>
-            <br />
-            <span>{event.date}</span>
-            <br />
-            <span>{event.description}</span>
-          </div>
-        ))
+        events.map((event) => {
+          const eventDate = new Date(event.date);
+          const formattedDate = eventDate.toLocaleDateString();
+  
+          return (
+            <div key={event.id} className="event">
+              <div className={styles.eventHeader}>
+                <strong className={styles.eventName}>{event.name}</strong>
+                <span className={styles.eventDate}>{formattedDate}</span>
+              </div>
+              <p className={styles.eventDescription}>{event.description}</p>
+            </div>
+          );
+        })
       ) : (
         <div>No upcoming events</div>
       )}
     </div>
   );
+  
+  
 
   return (
     <div id="header">
@@ -332,7 +340,7 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
                       {selectedStudyGroup === group.id && (
                         <Tooltip
                           title={renderTooltipContent()}
-                          placement="top-start"
+                          placement="right-start"
                           disableInteractive
                         >
                           <span className={styles.eventTrigger}>Events</span>

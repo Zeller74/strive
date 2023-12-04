@@ -352,7 +352,7 @@
 
 .eventText {
   visibility: hidden;
-  width: 250px;
+  width: 500px;
   background-color: black;
   color: white;
   text-align: left;
@@ -371,6 +371,31 @@
 .eventContainer:hover .eventText {
   visibility: visible;
   opacity: 1;
+}
+.event {
+  margin-bottom: 10px;
+}
+
+.eventHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.eventName {
+  font-size: 1.2em;
+}
+
+.eventDate {
+  font-size: 0.8em;
+  margin-left: 10px;
+}
+
+.eventDescription {
+  font-size: 0.9em;
+}
+.eventTrigger{
+  float: right;
 }
 
 .footer {
