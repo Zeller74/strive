@@ -473,7 +473,7 @@ function CreateEventForm({ currentStudyGroup }) {
             />
           </label>
           <br />
-          <button className={styles.createButton} type="submit">
+          <button className={styles.createButton1} type="submit">
             Create
           </button>
         </form>
@@ -760,7 +760,7 @@ export default function Home() {
                   </div>
                   <div>
                     <button
-                      className={styles.createButton}
+                      className={styles.searchButton}
                       onClick={toggleSearch}
                     >
                       Find Group
