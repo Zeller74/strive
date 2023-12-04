@@ -78,8 +78,8 @@ const SearchGroups = ({ isVisible, onClose }) => {
     const supabaseAccessToken = await getToken({ template: "supabase" });
     const supabase = await supabaseClient(supabaseAccessToken);
 
-    if (userGroups.includes(groupID)){ }
-    else {
+    if (userGroups.includes(groupID)) {
+    } else {
       await supabase
         .from("enrollment")
         .insert({ user_id: userId, study_group: groupID });
@@ -107,33 +107,51 @@ const SearchGroups = ({ isVisible, onClose }) => {
   return (
     <div className="search-container">
       <input
-        style={{marginLeft:10, maxWidth:"8.5rem"}} 
+        style={{ marginLeft: 10, maxWidth: "8.5rem" }}
         type="text"
         placeholder="Search groups..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-    <br></br>
-    <button style={{marginLeft:10}} className={styles.searchButton} onClick={() => joinGroup(selectedGroupID)}>Join Group</button>
-    <Box sx={{ maxHeight: "31rem", overflowY: 'auto', width: '100%', maxWidth: 360 }}>
-      <List component="nav" aria-label="main mailbox folders">
-      {filteredGroups.map((group) => (
-        <div key={group.id} className={styles.groupItem}>
-          {!(isUserMember(group.id)) && (
-            <Tooltip title={<h1 style={{ fontSize: 14 }}>{group.description}</h1>} placement="top" arrow disableInteractive>
-              <ListItemButton 
-              className={styles.infoButton}
-              selected={selectedGroupID == group.id}
-              onClick={(event) => handleListItemClick(event, group.id)}
-              >
-                {group.name} 
-              </ListItemButton>
-            </Tooltip>
-          )}
-        </div>
-      ))}
-      </List>
-    </Box>
+      <br></br>
+      <button
+        style={{ marginLeft: 10 }}
+        className={styles.searchButton}
+        onClick={() => joinGroup(selectedGroupID)}
+      >
+        Join Group
+      </button>
+      <Box
+        sx={{
+          maxHeight: "31rem",
+          overflowY: "auto",
+          width: "100%",
+          maxWidth: 360,
+        }}
+      >
+        <List component="nav" aria-label="main mailbox folders">
+          {filteredGroups.map((group) => (
+            <div key={group.id} className={styles.groupItem}>
+              {!isUserMember(group.id) && (
+                <Tooltip
+                  title={<h1 style={{ fontSize: 14 }}>{group.description}</h1>}
+                  placement="top"
+                  arrow
+                  disableInteractive
+                >
+                  <ListItemButton
+                    className={styles.infoButton}
+                    selected={selectedGroupID == group.id}
+                    onClick={(event) => handleListItemClick(event, group.id)}
+                  >
+                    {group.name}
+                  </ListItemButton>
+                </Tooltip>
+              )}
+            </div>
+          ))}
+        </List>
+      </Box>
     </div>
   );
 };
@@ -240,10 +258,12 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
   const renderTooltipContent = () => (
     <div className="events-tooltip">
       {events.length > 0 ? (
-        events.map(event => (
+        events.map((event) => (
           <div key={event.id} className="event">
-            <strong>{event.name}</strong><br />
-            <span>{event.date}</span><br />
+            <strong>{event.name}</strong>
+            <br />
+            <span>{event.date}</span>
+            <br />
             <span>{event.description}</span>
           </div>
         ))
@@ -283,7 +303,11 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
                       }
                       onClick={() => handleClick(group.id)}
                     >
-                      <Tooltip title={<h1 style={{ fontSize: 12 }}>Leave Group</h1>} placement="top-start" disableInteractive>
+                      <Tooltip
+                        title={<h1 style={{ fontSize: 12 }}>Leave Group</h1>}
+                        placement="top-start"
+                        disableInteractive
+                      >
                         <Button
                           sx={{ m: 1 }}
                           onClick={() => leaveGroup(group.id)}
@@ -296,22 +320,24 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
                             minHeight: "30px",
                           }}
                         >
-                          <IconContext.Provider value={{ size: '15px' }}>
+                          <IconContext.Provider value={{ size: "15px" }}>
                             <div>
-                              <RxCross1 style={{size:"10"}} ></RxCross1>
+                              <RxCross1 style={{ size: "10" }}></RxCross1>
                             </div>
                           </IconContext.Provider>
                         </Button>
-                      {selectedStudyGroup === group.id && (
-                        <div className={styles.eventContainer}>
-                          <span className={styles.eventTrigger}>Events</span>
-                          <div className={styles.eventText}>
-                            {renderTooltipContent()}
-                          </div>
-                        </div>
-                      )}
-                        {group.name}
                       </Tooltip>
+
+                      {group.name}
+                      {selectedStudyGroup === group.id && (
+                        <Tooltip
+                          title={renderTooltipContent()}
+                          placement="top-start"
+                          disableInteractive
+                        >
+                          <span className={styles.eventTrigger}>Events</span>
+                        </Tooltip>
+                      )}
                     </MenuItem>
                   </div>
                 </li>
@@ -409,7 +435,9 @@ function CreateGroupForm() {
 
   return (
     <div>
-      <button className={styles.createButton1} onClick={show}>Create Group</button>
+      <button className={styles.createButton1} onClick={show}>
+        Create Group
+      </button>
       {showForm && (
         <form className={styles.createGroupInput} onSubmit={handleSubmit}>
           <label>
@@ -629,9 +657,8 @@ function SendMessageForm({
         return;
       }
 
-      if(fileInputRef.current){
+      if (fileInputRef.current) {
         fileInputRef.current.value = "";
-
       }
       refreshMessages();
       setNewMessage("");
@@ -651,16 +678,27 @@ function SendMessageForm({
       setSelectedFileName(newFile.name); // Update the selected file name
     }
   };
-  
 
   return (
     <form className={styles.sendMessageForm} onSubmit={handleSubmit}>
-      <label for='file-input'>
-        <img src='https://www.freeiconspng.com/uploads/paper-clip-icon-24.png' width='40' style={{cursor: 'pointer'}}/>
+      <label for="file-input">
+        <img
+          src="https://www.freeiconspng.com/uploads/paper-clip-icon-24.png"
+          width="40"
+          style={{ cursor: "pointer" }}
+        />
       </label>
-      
-      <input id='file-input' type="file" onChange={handleFileChange} style={{ display: 'none' }} ref={fileInputRef}/>
-      {selectedFileName && <span className={styles.selectedFile}>{selectedFileName}</span>}
+
+      <input
+        id="file-input"
+        type="file"
+        onChange={handleFileChange}
+        style={{ display: "none" }}
+        ref={fileInputRef}
+      />
+      {selectedFileName && (
+        <span className={styles.selectedFile}>{selectedFileName}</span>
+      )}
       <input
         className={styles.chatInput}
         onChange={(e) => setNewMessage(e.target.value)}
@@ -794,7 +832,12 @@ export default function Home() {
                   </div>
 
                   {/* Search Section */}
-                  <div style={{ width:"10rem", display: isSearchVisible ? "block" : "none" }}>
+                  <div
+                    style={{
+                      width: "10rem",
+                      display: isSearchVisible ? "block" : "none",
+                    }}
+                  >
                     <SearchGroups
                       getToken={getToken}
                       isVisible={isSearchVisible}
@@ -878,39 +921,44 @@ export default function Home() {
                   </div>
                 </div>
               </>
-            
-            )
-            }
+            )}
           </div>
         </main>
       )}
-      {isSignedIn ? (<></>) : (
+      {isSignedIn ? (
+        <></>
+      ) : (
         <>
-        <div className={styles.footer}>
-          <div style={{flex: 1, textAlign:"center"}}>
-            <p style={{fontWeight: "bold", fontSize:20}}>About Us</p>
-            <p style={{fontSize:13}}>
-            STRIVE (Synchronous Team Review and Visualization Environment) was created by Jeffrey Yang, Paul Adelae, Hannah 
-            Nguyen, Rebecca Nguyen, and Joel Yates as a semester-long project for Software Engineering I at the 
-            University of Maryland, Baltimore County. Our goal was to make a web application that could act as
-            a convenient, user-friendly way to facilitate collaboration and team-learning amongst students.
-            </p>
+          <div className={styles.footer}>
+            <div style={{ flex: 1, textAlign: "center" }}>
+              <p style={{ fontWeight: "bold", fontSize: 20 }}>About Us</p>
+              <p style={{ fontSize: 13 }}>
+                STRIVE (Synchronous Team Review and Visualization Environment)
+                was created by Jeffrey Yang, Paul Adelae, Hannah Nguyen, Rebecca
+                Nguyen, and Joel Yates as a semester-long project for Software
+                Engineering I at the University of Maryland, Baltimore County.
+                Our goal was to make a web application that could act as a
+                convenient, user-friendly way to facilitate collaboration and
+                team-learning amongst students.
+              </p>
+            </div>
+            <div style={{ flex: 1, textAlign: "center" }}>
+              <p style={{ fontWeight: "bold", fontSize: 20 }}>Contact Us</p>
+              <a href="https://github.com/Zeller74/strive" target="_blank">
+                <button className={styles.githubButton}>
+                  <IoLogoGithub
+                    style={{ width: 55, height: 55 }}
+                  ></IoLogoGithub>
+                </button>
+              </a>
+              <p style={{ fontSize: 13 }}>
+                jyang13@umbc.edu | padelae1@umbc.edu | hannahn2@umbc.edu |
+                xv46495@umbc.edu | jyates1@umbc.edu
+              </p>
+            </div>
           </div>
-          <div style={{flex: 1, textAlign:"center"}}>
-            <p style={{fontWeight: "bold", fontSize:20}}>Contact Us</p>
-            <a href="https://github.com/Zeller74/strive" target="_blank"><button className={styles.githubButton}>
-              <IoLogoGithub style={{width:55, height:55}}></IoLogoGithub>
-            </button></a>
-            <p style={{fontSize:13}}>
-                jyang13@umbc.edu |
-                padelae1@umbc.edu |
-                hannahn2@umbc.edu |
-                xv46495@umbc.edu | 
-                jyates1@umbc.edu 
-            </p>
-          </div>
-        </div>
-        </>)}
+        </>
+      )}
     </>
   );
 }
