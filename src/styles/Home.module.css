@@ -89,7 +89,7 @@
 
 .studyGroupButton {
   display: block;
-  padding: 10px;
+  padding: 5px;
   cursor: pointer;
   border: 2px solid #000;
   margin-bottom: 5px;
@@ -110,20 +110,6 @@
   flex: 0 0 200px;
   margin-right: 00px;
   width: 200px;
-}
-
-.studyGroupButton {
-  display: block;
-  padding: 10px;
-  cursor: pointer;
-  border: 2px solid #000;
-  margin-bottom: 5px;
-  transition: background-color 0.3s;
-  text-align: left;
-  width: 100%;
-  box-sizing: border-box;
-  background-color: #fff;
-  color: #000;
 }
 
 .studyGroupButton:hover {
@@ -148,14 +134,6 @@
   border-radius: 4px;
   margin-bottom: 10px;
   background-color: rgb(224, 224, 224);
-}
-
-.createEventInput {
-  margin: 0 auto;
-  padding: 10px;
-  border-radius: 4px;
-  margin-bottom: 10px;
-  background-color: #d6d2c9;
 }
 
 .createButton1 {
