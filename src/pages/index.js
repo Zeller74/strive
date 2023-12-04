@@ -449,6 +449,7 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
 
 function CreateGroupForm() {
   const { getToken, userId } = useAuth();
+  const { refreshGroups } = useGroup();
   const [groupName, setGroupName] = useState("");
   const [groupDescription, setGroupDescription] = useState("");
   const [showForm, setShowForm] = useState(false);
@@ -502,6 +503,7 @@ function CreateGroupForm() {
       setGroupName("");
       setGroupDescription("");
       setShowForm(false);
+      refreshGroups();
     } catch (error) {
       console.error("Error during group creation and joining:", error);
     }
