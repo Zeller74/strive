@@ -589,7 +589,10 @@ function SendMessageForm({
 
   return (
     <form className={styles.sendMessageForm} onSubmit={handleSubmit}>
-      <input type="file" onChange={handleFileChange} />
+      <label for='file-input'>
+        <img src='https://www.freeiconspng.com/uploads/paper-clip-icon-24.png' width='40'/>
+      </label>
+      <input id='file-input' type="file" onChange={handleFileChange} style={{ display: 'none' }}/>
       <input
         className={styles.chatInput}
         onChange={(e) => setNewMessage(e.target.value)}
