@@ -1,9 +1,28 @@
 .main {
   margin: 0;
   height: 100%;
-  overflow-y: hidden
+  overflow-y: hidden;
+  background-color: white;
 }
 
+@media (prefers-color-scheme: dark) {
+  .container{
+    background-color: rgb(58,58,58);
+  }
+  /*iussue with text color on dark*/
+  .label {
+    padding: 0.5rem 1rem;
+    color: white;
+  }
+  .studyGroupContainer{
+    background-color: rgb(58,58,58);
+    color: black;
+  
+  }
+  .createButton1{
+    border-color: rgb(58,58,58);
+  }
+}
 .header {
   padding: 1rem 2rem;
   height: 3rem;
@@ -146,10 +165,16 @@
   padding: 5px 5px;
   background-color: #0077b6;
   border-radius: 4px;
+  
   color: #ffffff;
   height: 4rem;
   width: 7rem;
   border-width: thin
+}
+
+.createButton1:hover{
+  background-color: #005486;
+  transition: background-color 0.3s;
 }
 
 .createButton2 {
@@ -195,7 +220,6 @@
   background: white;
   color: rgb(0, 31, 41);
   border-color: rgb(0, 31, 41);
-  ;
 }
 
 .accountUp {
@@ -217,6 +241,12 @@
   ;
 }
 
+.dark-mode{
+  background-color: #000;
+}
+.light-mode{
+  background-color: white;
+}
 .banner {
   display: flex;
   margin-bottom: -40px;
