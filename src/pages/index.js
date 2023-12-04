@@ -143,6 +143,11 @@ const SearchGroups = ({ isVisible, onClose }) => {
                     className={styles.infoButton}
                     selected={selectedGroupID == group.id}
                     onClick={(event) => handleListItemClick(event, group.id)}
+                    sx={{
+                      "&.Mui-selected":{
+                        backgroundColor: "#56c5fc"
+                      }
+                    }}
                   >
                     {group.name}
                   </ListItemButton>
