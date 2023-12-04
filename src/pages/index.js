@@ -566,7 +566,6 @@ function SendMessageForm({
         text: messageContent,
         user_id: userId,
         study_group: selectedStudyGroup,
-        // Additional fields if needed
       });
 
       if (messageError) {
