@@ -224,11 +224,6 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
     };
 
     fetchGroups();
-    const intervalId = setInterval(fetchGroups, 3000);
-
-    return () => {
-      clearInterval(intervalId);
-    };
   }, [userId, selectedStudyGroup, setSelectedStudyGroup, isInitialGroupSet]);
 
   const leaveGroup = async (groupId) => {
