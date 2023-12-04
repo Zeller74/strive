@@ -8,8 +8,8 @@
   overflow-y: scroll;
   position: fixed;
   z-index: 99;
-  max-height: 100vh;
-  min-height: 100vh;
+  max-height: 90vh;
+  min-height: 90vh;
   top: 0;
   left: 0;
   margin-top: 4rem;
