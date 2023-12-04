@@ -481,6 +481,8 @@ function SendMessageForm({
   const [newMessage, setNewMessage] = useState("");
   const { session } = useSession();
   const [studyGroup, setStudyGroup] = useState(null);
+  const [selectedFileName, setSelectedFileName] = useState("");
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const fetchStudyGroup = async () => {
@@ -573,9 +575,14 @@ function SendMessageForm({
         return;
       }
 
+      if(fileInputRef.current){
+        fileInputRef.current.value = "";
+
+      }
       refreshMessages();
       setNewMessage("");
-      setFile(null); // Clear file input
+      setFile(null);
+      setSelectedFileName(""); // Clear the selected file name
     } catch (error) {
       console.error("Error:", error);
     }
@@ -584,15 +591,22 @@ function SendMessageForm({
   const [file, setFile] = useState(null);
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]);
+    const newFile = e.target.files[0];
+    if (newFile) {
+      setFile(newFile); // Update the file state
+      setSelectedFileName(newFile.name); // Update the selected file name
+    }
   };
+  
 
   return (
     <form className={styles.sendMessageForm} onSubmit={handleSubmit}>
       <label for='file-input'>
-        <img src='https://www.freeiconspng.com/uploads/paper-clip-icon-24.png' width='40'/>
+        <img src='https://www.freeiconspng.com/uploads/paper-clip-icon-24.png' width='40' style={{cursor: 'pointer'}}/>
       </label>
-      <input id='file-input' type="file" onChange={handleFileChange} style={{ display: 'none' }}/>
+      
+      <input id='file-input' type="file" onChange={handleFileChange} style={{ display: 'none' }} ref={fileInputRef}/>
+      {selectedFileName && <span className={styles.selectedFile}>{selectedFileName}</span>}
       <input
         className={styles.chatInput}
         onChange={(e) => setNewMessage(e.target.value)}
