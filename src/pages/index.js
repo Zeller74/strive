@@ -91,7 +91,6 @@ const GroupProvider = ({ children }) => {
   useEffect(() => {
     const fetchData = async () => {
       await refreshGroups();
-      await refreshUserGroups();
       setLoading(false);
     };
     fetchData();
