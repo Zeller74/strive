@@ -27,7 +27,8 @@ You can access the website at: https://strive-ruby.vercel.app/
 
 
 **If you would like to run locally:** <br>
-Install the following node packages using `npm install` <br>
+Clone the repository into a folder and run `npm install` to install dependencies.
+These packages should be installed: <br>
 ├── @clerk/nextjs@4.25.2 <br>
 ├── @emotion/react@11.11.1 <br>
 ├── @emotion/styled@11.11.0 <br>
@@ -49,6 +50,8 @@ Install the following node packages using `npm install` <br>
 └── tailwindcss@3.3.3 <br>
 
 Then run the app with `npm run dev`
+
+The main code functionality is within /src/pages/index.js, with the styling in /src/styles/Home.module.css.
 
 
 **If your screen looks like this:** 
