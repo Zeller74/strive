@@ -22,31 +22,31 @@ STRIVE provides the ability to join a variety of different study groups, chat am
 * Vercel used for hosting
 
 
-**How to Run:**
+**How to Run:** <br>
 You can access the website at: https://strive-ruby.vercel.app/
 
 
-**If you would like to run locally:**
-Install the following node packages using `npm install`
-├── @clerk/nextjs@4.25.2
-├── @emotion/react@11.11.1
-├── @emotion/styled@11.11.0
-├── @mui/material@5.14.14
-├── @supabase/realtime-js@2.8.1
-├── @supabase/supabase-js@2.38.1
-├── @tabler/icons-react@2.39.0
-├── @types/react@18.2.34
-├── autoprefixer@10.4.16
-├── eslint-config-next@13.5.4
-├── eslint@8.50.0
-├── next@13.5.4
-├── postcss@8.4.31
-├── react-dom@18.2.0
-├── react-icons@4.11.0
-├── react-modal@3.16.1
-├── react-pro-sidebar@0.7.1
-├── react@18.2.0
-└── tailwindcss@3.3.3
+**If you would like to run locally:** <br>
+Install the following node packages using `npm install` <br>
+├── @clerk/nextjs@4.25.2 <br>
+├── @emotion/react@11.11.1 <br>
+├── @emotion/styled@11.11.0 <br>
+├── @mui/material@5.14.14 <br>
+├── @supabase/realtime-js@2.8.1 <br>
+├── @supabase/supabase-js@2.38.1 <br>
+├── @tabler/icons-react@2.39.0 <br>
+├── @types/react@18.2.34 <br>
+├── autoprefixer@10.4.16 <br>
+├── eslint-config-next@13.5.4 <br>
+├── eslint@8.50.0 <br>
+├── next@13.5.4 <br>
+├── postcss@8.4.31 <br>
+├── react-dom@18.2.0 <br>
+├── react-icons@4.11.0 <br>
+├── react-modal@3.16.1 <br>
+├── react-pro-sidebar@0.7.1 <br>
+├── react@18.2.0 <br>
+└── tailwindcss@3.3.3 <br>
 
 Then run the app with `npm run dev`
 
