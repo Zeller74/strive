@@ -22,10 +22,11 @@ STRIVE provides the ability to join a variety of different study groups, chat am
 * Vercel used for hosting
 
 
-** How to Run: **
+**How to Run:**
 You can access the website at: https://strive-ruby.vercel.app/
 
-If you would like to run locally: 
+
+**If you would like to run locally:**
 Install the following node packages using `npm install`
 ├── @clerk/nextjs@4.25.2
 ├── @emotion/react@11.11.1
@@ -50,6 +51,6 @@ Install the following node packages using `npm install`
 Then run the app with `npm run dev`
 
 
-** If your screen looks like this: ** 
+**If your screen looks like this:** 
 ![image](https://github.com/Zeller74/strive/assets/84753929/45f4cfb8-24d9-4c08-b09a-9dba5b71df5f)
-You please go into the `/src/styles/globals.css` and change `@media (prefers-color-scheme: dark)` to `@media (prefers-color-scheme: light)`
+Please go into the `/src/styles/globals.css` and change `@media (prefers-color-scheme: dark)` to `@media (prefers-color-scheme: light)`
