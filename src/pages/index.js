@@ -1,8 +1,11 @@
+//import css and react functions
 import styles from "../styles/Home.module.css";
 import React, { useContext, createContext, useState, useEffect, useRef } from "react";
 import { FaCalendarAlt } from 'react-icons/fa';
+import { IconContext } from "react-icons";
+import { IoLogoGithub, IoMdInformationCircleOutline } from "react-icons/io";
 
-
+//clerk auth and user session hooks
 import {
   useAuth,
   useUser,
@@ -12,9 +15,8 @@ import {
   useSession,
 } from "@clerk/nextjs";
 
+//database client for database interactions
 import { createClient } from "@supabase/supabase-js";
-import { IconContext } from "react-icons";
-import { IoLogoGithub, IoMdInformationCircleOutline } from "react-icons/io";
 
 //import react pro sidebar components
 import {
@@ -24,6 +26,7 @@ import {
   SidebarHeader,
   SidebarContent,
 } from "react-pro-sidebar";
+//mui components
 import { Button, Box, List, ListItemButton, Tooltip } from "@mui/material";
 
 //import icons from react icons
@@ -33,18 +36,21 @@ import { RxCross1 } from "react-icons/rx";
 //import sidebar css from react-pro-sidebar module and custom css
 import "react-pro-sidebar/dist/css/styles.css";
 
+//context and hook for group data
 const GroupContext = createContext();
-
 const useGroup = () => useContext(GroupContext);
 
+//provider for group context, state and functionality for groups
 const GroupProvider = ({ children }) => {
-  const { getToken, userId } = useAuth();
-  const [groups, setGroups] = useState([]);
-  const [userGroups, setUserGroups] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { getToken, userId } = useAuth(); //auth hook for token and userid
+  const [groups, setGroups] = useState([]); //all groups state
+  const [userGroups, setUserGroups] = useState([]); //user groups state
+  const [loading, setLoading] = useState(true); //loading status
 
+  //refresh and update all data
   const refreshGroups = async () => {
     try {
+      //creating supabase client using token
       const supabaseAccessToken = await getToken({ template: "supabase" });
       const supabase = await supabaseClient(supabaseAccessToken);
 
@@ -61,6 +67,7 @@ const GroupProvider = ({ children }) => {
         .eq("user_id", userId);
       if (userGroupsError) throw userGroupsError;
 
+      //sets groups to match current data
       setGroups(allGroupsData);
       setUserGroups(userGroupsData.map((enrollment) => enrollment.study_group));
       console.log("Groups:", allGroupsData);
@@ -71,6 +78,7 @@ const GroupProvider = ({ children }) => {
     }
   };
 
+  //similar function, just refreshes user groups only; was being used when user groups wasnt loading properly
   const refreshUserGroups = async () => {
     try {
       const supabaseAccessToken = await getToken({ template: "supabase" });
@@ -88,6 +96,7 @@ const GroupProvider = ({ children }) => {
     }
   };
 
+  //effect for initial data fetch on component mount
   useEffect(() => {
     const fetchData = async () => {
       await refreshGroups();
@@ -96,6 +105,7 @@ const GroupProvider = ({ children }) => {
     fetchData();
   }, [userId]);
 
+  //provides context data to child components
   return (
     <GroupContext.Provider value={{ groups, userGroups, loading, refreshGroups, refreshUserGroups }}>
       {children}
@@ -103,8 +113,7 @@ const GroupProvider = ({ children }) => {
   );
 };
 
-
-
+//create and configure supabase client instance
 const supabaseClient = async (supabaseAccessToken) => {
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -117,12 +126,16 @@ const supabaseClient = async (supabaseAccessToken) => {
   return supabase;
 };
 
+//component for joining and searching for groups
 const SearchGroups = ({ isVisible, onClose }) => {
   const { getToken, userId } = useAuth();
   const { refreshGroups, groups, userGroups } = useGroup();
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selectedGroupID, setSelectedGroupID] = useState(""); // see what is selected
 
+  //search term and selected group
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedGroupID, setSelectedGroupID] = useState("");
+
+  //effect to fetch groups when the component is visible
   useEffect(() => {
     const fetchGroupsAndUserGroups = async () => {
       if (!isVisible) return;
@@ -146,10 +159,12 @@ const SearchGroups = ({ isVisible, onClose }) => {
     fetchGroupsAndUserGroups();
   }, [isVisible, getToken, userId]);
 
+  //handles joining group
   const joinGroup = async (groupID) => {
     const supabaseAccessToken = await getToken({ template: "supabase" });
     const supabase = await supabaseClient(supabaseAccessToken);
 
+    //dont join group already a part of
     if (userGroups.includes(groupID)) {
     } else {
       await supabase
@@ -160,10 +175,12 @@ const SearchGroups = ({ isVisible, onClose }) => {
     }
   };
 
+  //checks if user is already member
   const isUserMember = (groupID) => {
     return userGroups.includes(groupID);
   };
 
+  //filter groups based on search term
   const filteredGroups = searchTerm
     ? groups.filter((group) =>
       group.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -172,6 +189,7 @@ const SearchGroups = ({ isVisible, onClose }) => {
 
   if (!isVisible) return null;
 
+  //handles click (selected group)
   const handleListItemClick = (event, groupID) => {
     setSelectedGroupID(groupID);
   };
@@ -233,17 +251,22 @@ const SearchGroups = ({ isVisible, onClose }) => {
   );
 };
 
+//component for displaying chat messages in container
 const ChatMessages = ({ messages, setMessages }) => {
+  //useRef hook to reference chat container
   const containerRef = useRef(null);
 
+  //effect hook to scroll to bottom of container when new messages arrive
   useEffect(() => {
     const container = containerRef.current;
+    //if container is available scroll to bottom
     if (container) {
       container.scrollTop = container.scrollHeight;
     }
-  }, [messages]);
+  }, [messages]); //reruns when messages changes
 
   return (
+    //chat container
     <div className="chatContainer" ref={containerRef}>
       {messages?.filter(Boolean).map((message) => (
         <div key={message.id}>
@@ -255,12 +278,14 @@ const ChatMessages = ({ messages, setMessages }) => {
   );
 };
 
+//component for choosing group for the chat
 function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
   const { getToken, userId } = useAuth();
   const { refreshGroups, groups, userGroups } = useGroup();
   const [events, setEvents] = useState([]);
   const [isInitialGroupSet, setIsInitialGroupSet] = useState(false);
 
+  //fetches events for selected study group
   const fetchEvents = async () => {
     if (selectedStudyGroup != null && selectedStudyGroup !== undefined) {
       const supabaseAccessToken = await getToken({ template: "supabase" });
@@ -279,15 +304,14 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
     }
   };
 
+  //fetch events on component mount
   useEffect(() => {
-
-
     fetchEvents();
     console.log("Groups from context:", groups);
     console.log("User Groups from context:", userGroups);
-
   }, [userId, selectedStudyGroup, setSelectedStudyGroup, isInitialGroupSet]);
 
+  //function for leaving group
   const leaveGroup = async (groupId) => {
     console.log("Attempting to leave group with ID:", groupId);
 
@@ -307,6 +331,7 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
     }
   };
 
+  //changes selected group
   const handleClick = (groupId) => {
     setSelectedStudyGroup(groupId);
   };
@@ -320,6 +345,7 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
     menuCollapse ? setMenuCollapse(false) : setMenuCollapse(true);
   };
 
+  //renders tooltip content for events when hovering
   const renderTooltipContent = () => (
     <div className="events-tooltip">
       {events.length > 0 ? (
@@ -446,6 +472,7 @@ function StudyGroups({ selectedStudyGroup, setSelectedStudyGroup }) {
   );
 }
 
+//component for creating a group
 function CreateGroupForm() {
   const { getToken, userId } = useAuth();
   const { refreshGroups } = useGroup();
@@ -453,6 +480,7 @@ function CreateGroupForm() {
   const [groupDescription, setGroupDescription] = useState("");
   const [showForm, setShowForm] = useState(false);
 
+  //submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -460,6 +488,7 @@ function CreateGroupForm() {
       const supabaseAccessToken = await getToken({ template: "supabase" });
       const supabase = await supabaseClient(supabaseAccessToken);
 
+      //check if group with same name exists
       const { data: existingGroups, error: groupError } = await supabase
         .from("study_group")
         .select("id")
@@ -472,12 +501,14 @@ function CreateGroupForm() {
         return;
       }
 
+      //group creation
       let { error } = await supabase
         .from("study_group")
         .insert([{ name: groupName, description: groupDescription }]);
 
       if (error) throw error;
 
+      //fetch the newly made group
       let { data: groups, error: fetchError } = await supabase
         .from("study_group")
         .select("id")
@@ -492,13 +523,14 @@ function CreateGroupForm() {
       }
       const newGroupId = groups[0].id;
 
+      //enroll the user in the group
       let { error: joinError } = await supabase
         .from("enrollment")
         .insert([{ study_group: newGroupId, user_id: userId }]);
 
       if (joinError) throw joinError;
 
-      // If everything is successful, clear the form
+      //If everything is successful, clear the form
       setGroupName("");
       setGroupDescription("");
       setShowForm(false);
@@ -508,6 +540,7 @@ function CreateGroupForm() {
     }
   };
 
+  //toggle form visibility
   const show = () => {
     setShowForm(!showForm);
   };
@@ -547,6 +580,7 @@ function CreateGroupForm() {
   );
 }
 
+//component for creating an event
 function CreateEventForm({ currentStudyGroup }) {
   const { getToken, userId } = useAuth();
   const [eventName, setEventName] = useState("");
@@ -554,6 +588,7 @@ function CreateEventForm({ currentStudyGroup }) {
   const [eventDate, setEventDate] = useState("");
   const [showForm, setShowForm] = useState(false);
 
+  //submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -561,6 +596,7 @@ function CreateEventForm({ currentStudyGroup }) {
       const supabaseAccessToken = await getToken({ template: "supabase" });
       const supabase = await supabaseClient(supabaseAccessToken);
 
+      //insert new event
       let { error } = await supabase.from("events").insert([
         {
           name: eventName,
@@ -582,6 +618,7 @@ function CreateEventForm({ currentStudyGroup }) {
     }
   };
 
+  //toggle visibility
   const show = () => {
     setShowForm(!showForm);
   };
@@ -632,6 +669,7 @@ function CreateEventForm({ currentStudyGroup }) {
   );
 }
 
+//component for sending messages and file upload
 function SendMessageForm({
   messages,
   setMessages,
@@ -639,12 +677,13 @@ function SendMessageForm({
   selectedStudyGroup,
 }) {
   const { getToken, userId } = useAuth();
-  const [newMessage, setNewMessage] = useState("");
+  const [newMessage, setNewMessage] = useState(""); //new message state
   const { session } = useSession();
   const [studyGroup, setStudyGroup] = useState(null);
-  const [selectedFileName, setSelectedFileName] = useState("");
-  const fileInputRef = useRef(null);
+  const [selectedFileName, setSelectedFileName] = useState(""); //file name state
+  const fileInputRef = useRef(null); //ref to file input for resetting
 
+  //fetches user groups on mount / when user changes
   useEffect(() => {
     const fetchStudyGroup = async () => {
       const supabaseAccessToken = await getToken({ template: "supabase" });
@@ -659,9 +698,11 @@ function SendMessageForm({
     fetchStudyGroup();
   }, [userId]);
 
+  //form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    //nothing there
     if (!newMessage && !file) {
       console.log("No message or file to send");
       return;
@@ -677,6 +718,7 @@ function SendMessageForm({
         const fileName = `${selectedStudyGroup}/${Date.now()}-${file.name}`;
         const filePath = `${fileName}`;
 
+        //upload file to storage
         const { data: uploadData, error: uploadError } = await supabase.storage
           .from("studygroupfiles")
           .upload(filePath, file);
@@ -686,7 +728,7 @@ function SendMessageForm({
           return;
         }
 
-        // Get the public URL for the new file
+        //Get the public URL for the new file
         const response = await supabase.storage
           .from("studygroupfiles")
           .getPublicUrl(filePath);
@@ -698,6 +740,7 @@ function SendMessageForm({
 
         fileURL = response.data.publicUrl;
 
+        //save file information in database
         const { error: dbError } = await supabase.from("resource").insert({
           path: fileURL,
           name: file.name,
@@ -712,7 +755,7 @@ function SendMessageForm({
         }
       }
 
-      // Construct the message content
+      //Construct the message content
       let messageContent = newMessage;
       if (fileURL) {
         const fileType = file.type.split("/")[0];
@@ -724,7 +767,7 @@ function SendMessageForm({
         messageContent += messageContent ? " " + fileMessage : fileMessage;
       }
 
-      // Send the message
+      //insert message to database
       const { error: messageError } = await supabase.from("message").insert({
         text: messageContent,
         user_id: userId,
@@ -736,28 +779,32 @@ function SendMessageForm({
         return;
       }
 
+      //reset form
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
       refreshMessages();
       setNewMessage("");
       setFile(null);
-      setSelectedFileName(""); // Clear the selected file name
+      setSelectedFileName(""); //Clear the selected file name
     } catch (error) {
       console.error("Error:", error);
     }
   };
 
+  //state for file 
   const [file, setFile] = useState(null);
 
+  //handles when user changes what file they selected
   const handleFileChange = (e) => {
     const newFile = e.target.files[0];
     if (newFile) {
-      setFile(newFile); // Update the file state
-      setSelectedFileName(newFile.name); // Update the selected file name
+      setFile(newFile); //Update the file state
+      setSelectedFileName(newFile.name); //Update the selected file name
     }
   };
 
+  //render form with file upload and message input
   return (
     <form className={styles.sendMessageForm} onSubmit={handleSubmit}>
       <label for="file-input">
@@ -788,23 +835,26 @@ function SendMessageForm({
   );
 }
 
+//home component (main container)
 export default function Home() {
+  //hooks for user state, messages, and study group
   const { isSignedIn, isLoading, user } = useUser();
   const [messages, setMessages] = useState([]);
   const { getToken, userId } = useAuth();
   const [selectedStudyGroup, setSelectedStudyGroup] = useState(0); // State for the selected group
   const [isSearchVisible, setSearchVisible] = useState(false);
 
-  // Function to handle opening and closing the search section
+  //toggle visibility
   const toggleSearch = () => {
     setSearchVisible(!isSearchVisible);
   };
 
+  //fetch messages for selected group
   async function fetchMessagesForGroup() {
     const supabaseAccessToken = await getToken({ template: "supabase" });
     const supabase = await supabaseClient(supabaseAccessToken);
 
-    // Fetch messages for the group
+    //Fetch messages for the group, order by id (becomes chronological)
     const { data: groupMessages, error: error1 } = await supabase
       .from("message")
       .select("*")
@@ -816,7 +866,7 @@ export default function Home() {
       return;
     }
 
-    // Fetch all users
+    //fetch user information to display with messages
     const { data: users, error: error2 } = await supabase
       .from("user")
       .select("*");
@@ -826,7 +876,7 @@ export default function Home() {
       return;
     }
 
-    // Manually join the messages with users
+    //Manually join the messages with user information
     const joinedMessages = groupMessages.map((message) => {
       const userForMessage = users.find(
         (user) => user.user_id === message.user_id
@@ -837,11 +887,11 @@ export default function Home() {
       };
     });
 
-    setMessages(joinedMessages);
+    setMessages(joinedMessages); //update state
   }
 
+  //ensures user is in supabase database
   useEffect(() => {
-    // Function to ensure user exists in Supabase
     async function ensureUserInSupabase() {
       if (isLoading || !isSignedIn || !user) return; // Exit early if loading, not signed in, or no user
 
@@ -869,6 +919,7 @@ export default function Home() {
     ensureUserInSupabase();
   }, [isLoading, isSignedIn, user, getToken]);
 
+  //fetch messages for group
   useEffect(() => {
     fetchMessagesForGroup();
     // Set up an interval to call it every 5 seconds
@@ -878,6 +929,7 @@ export default function Home() {
     return () => clearInterval(interval);
   }, [selectedStudyGroup]);
 
+  //render main ui components
   return (
     <GroupProvider>
       <Header />
